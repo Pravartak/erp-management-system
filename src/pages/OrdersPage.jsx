@@ -5,6 +5,7 @@ import MobileBottomNav from "../components/MobileBottomNav";
 import SideNavBar from "../components/SideNavBar";
 import TopNavBar from "../components/TopNavBar";
 import CreatePOModal from "../components/orders/CreatePOModal";
+import CreateSOModal from "../components/orders/CreateSOModal";
 import OrdersAnalytics from "../components/orders/OrdersAnalytics";
 import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersLiveActivity from "../components/orders/OrdersLiveActivity";
@@ -14,7 +15,9 @@ import api from "../backend/api/api";
 
 const OrdersPage = () => {
 	const [isCreatePOModalOpen, setCreatePOModalOpen] = useState(false);
+	const [isCreateSOModalOpen, setCreateSOModalOpen] = useState(false);
 	const [purchaseOrders, setPurchaseOrders] = useState([]);
+	const [salesOrders, setSalesOrders] = useState([]);
 
 	useEffect(() => {
 		const fetchPOs = async () => {
@@ -25,8 +28,41 @@ const OrdersPage = () => {
 				console.error(e);
 			}
 		};
+
+		const fetchSOs = async () => {
+			try {
+				const res = await api.get("/salesOrders");
+				setSalesOrders(res.data);
+			} catch (e) {
+				console.error(e);
+			}
+		};
+
 		fetchPOs();
-	});
+		fetchSOs();
+	}, []);
+
+	const handleDeletePurchaseOrder = async (id) => {
+		try {
+			await api.delete(`/purchaseOrders/${id}`);
+			setPurchaseOrders((currentOrders) =>
+				currentOrders.filter((order) => order._id !== id),
+			);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const handleDeleteSalesOrder = async (id) => {
+		try {
+			await api.delete(`/salesOrders/${id}`);
+			setSalesOrders((currentOrders) =>
+				currentOrders.filter((order) => order._id !== id),
+			);
+		} catch (e) {
+			console.error(e);
+		}
+	};
 
 	return (
 		<Box
@@ -54,14 +90,25 @@ const OrdersPage = () => {
 					}}>
 					<OrdersHeader
 						onCreatePurchaseOrder={() => setCreatePOModalOpen(true)}
+						onCreateSalesOrders={() => setCreateSOModalOpen(true)}
 					/>
 					<CreatePOModal
 						open={isCreatePOModalOpen}
 						handleClose={() => setCreatePOModalOpen(false)}
 						purchaseOrders={purchaseOrders}
 					/>
+					<CreateSOModal
+						open={isCreateSOModalOpen}
+						handleClose={() => setCreateSOModalOpen(false)}
+						salesOrders={salesOrders}
+					/>
 					<OrdersSummary />
-					<OrdersTable purchaseOrders={purchaseOrders} />
+					<OrdersTable
+						purchaseOrders={purchaseOrders}
+						salesOrders={salesOrders}
+						onDeletePurchaseOrder={handleDeletePurchaseOrder}
+						onDeleteSalesOrder={handleDeleteSalesOrder}
+					/>
 					<Grid container spacing={3} sx={{ mt: 4 }}>
 						<Grid item xs={12} lg={8}>
 							<OrdersAnalytics />

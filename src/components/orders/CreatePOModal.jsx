@@ -17,7 +17,7 @@ import { customColors } from "../../theme";
 import MaterialIcon from "../MaterialIcon";
 import api from "../../backend/api/api";
 
-const CreatePOModal = ({ open, handleClose, onSubmit, purchaseOrders }) => {
+const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 	const textFieldStyles = useMemo(
 		() => ({
 			"& .MuiInputBase-root": {
@@ -103,8 +103,6 @@ const CreatePOModal = ({ open, handleClose, onSubmit, purchaseOrders }) => {
 			form.orderNumber = `#PO-${nextPurchaseOrderNumber}`;
 		}
 	});
-
-	// const createPO = async () => {};
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();

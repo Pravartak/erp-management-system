@@ -3,6 +3,8 @@ import {
 	Box,
 	Button,
 	IconButton,
+	Menu,
+	MenuItem,
 	Paper,
 	Table,
 	TableBody,
@@ -12,74 +14,6 @@ import {
 } from "@mui/material";
 import MaterialIcon from "../MaterialIcon";
 import OrdersPagination from "./OrdersPagination";
-
-const salesOrders = [
-	{
-		orderNumber: "#SO-29402",
-		date: "Oct 24, 2023",
-		initials: "TC",
-		initialsBg: "#dbeafe",
-		initialsColor: "#1d4ed8",
-		customer: "TechCorp Solutions",
-		itemName: "Enterprise Server X",
-		amount: "$12,450.00",
-		status: "Completed",
-		statusBg: "#dcfce7",
-		statusColor: "#15803d",
-	},
-	{
-		orderNumber: "#SO-29401",
-		date: "Oct 23, 2023",
-		initials: "NL",
-		initialsBg: "#ede9fe",
-		initialsColor: "#6d28d9",
-		customer: "Nova Logistics",
-		itemName: "Office Desks",
-		amount: "$3,120.50",
-		status: "Pending",
-		statusBg: "#ffedd5",
-		statusColor: "#c2410c",
-	},
-	{
-		orderNumber: "#SO-29398",
-		date: "Oct 22, 2023",
-		initials: "GR",
-		initialsBg: "#f1f5f9",
-		initialsColor: "#64748b",
-		customer: "Global Retailers",
-		itemName: "Wireless Keyboards",
-		amount: "$890.00",
-		status: "Cancelled",
-		statusBg: "#fee2e2",
-		statusColor: "#b91c1c",
-	},
-	{
-		orderNumber: "#SO-29395",
-		date: "Oct 21, 2023",
-		initials: "MI",
-		initialsBg: "#ffedd5",
-		initialsColor: "#c2410c",
-		customer: "Midwest Industries",
-		itemName: "Industrial Robot Arm",
-		amount: "$56,000.00",
-		status: "Completed",
-		statusBg: "#dcfce7",
-		statusColor: "#15803d",
-	},
-	{
-		orderNumber: "#SO-29390",
-		date: "Oct 20, 2023",
-		initials: "AS",
-		initialsBg: "#dbeafe",
-		initialsColor: "#1d4ed8",
-		customer: "Apex Systems",
-		itemName: "Cloud Storage Auth",
-		amount: "$1,420.00",
-		status: "Pending",
-		statusBg: "#ffedd5",
-		statusColor: "#c2410c",
-	},
-];
 
 const tabButtonStyles = (active) => ({
 	px: 3,
@@ -107,11 +41,42 @@ const formatDate = (value) => {
 	}).format(date);
 };
 
-const OrdersTable = ({ purchaseOrders = [] }) => {
+const OrdersTable = ({
+	purchaseOrders = [],
+	salesOrders = [],
+	onDeletePurchaseOrder,
+	onDeleteSalesOrder,
+}) => {
 	const [activeTab, setActiveTab] = useState("sales");
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [selectedOrder, setSelectedOrder] = useState(null);
 
 	const isSalesOrders = activeTab === "sales";
 	const entityLabel = isSalesOrders ? "Customer" : "Supplier";
+
+	const handleMenuClick = (event, order) => {
+		setAnchorEl(event.currentTarget);
+		setSelectedOrder(order);
+	};
+
+	const handleMenuClose = () => {
+		setAnchorEl(null);
+		setSelectedOrder(null);
+	};
+
+	const handleDeleteOrder = () => {
+		if (!selectedOrder) {
+			return;
+		}
+
+		if (selectedOrder.type === "sales") {
+			onDeleteSalesOrder?.(selectedOrder.originalId);
+		} else {
+			onDeletePurchaseOrder?.(selectedOrder.originalId);
+		}
+
+		handleMenuClose();
+	};
 
 	const formattedPOs = purchaseOrders.map((po) => {
 		const supplierName = po.supplier?.trim() || "Unknown Supplier";
@@ -122,12 +87,14 @@ const OrdersTable = ({ purchaseOrders = [] }) => {
 			.slice(0, 2)
 			.join("")
 			.toUpperCase();
-			
+
 		const quantity = Number(po.products.quantity || 0);
 		const unitPrice = Number(po.products.unitPrice || 0);
 		const amount = quantity * unitPrice;
 
 		return {
+			originalId: po._id,
+			type: "purchase",
 			orderNumber: po.orderNumber,
 			date: formatDate(po.createdAt),
 			supplier: supplierName,
@@ -158,8 +125,56 @@ const OrdersTable = ({ purchaseOrders = [] }) => {
 							: "#c2410c",
 		};
 	});
-	
-	const rows = isSalesOrders ? salesOrders : formattedPOs;
+
+	const formattedSOs = salesOrders.map((so) => {
+		const customerName = so.customer?.trim() || "Unknown Customer";
+		const initials = customerName
+			.split(" ")
+			.map((word) => word[0])
+			.filter(Boolean)
+			.slice(0, 2)
+			.join("")
+			.toUpperCase();
+
+		const quantity = Number(so.products.quantity || 0);
+		const unitPrice = Number(so.products.unitPrice || 0);
+		const amount = quantity * unitPrice;
+
+		return {
+			originalId: so._id,
+			type: "sales",
+			orderNumber: so.orderNumber,
+			date: formatDate(so.createdAt),
+			customer: customerName,
+			initials: initials || "PO",
+			initialsBg: "#dbeafe",
+			initialsColor: "#1d4ed8",
+			contactEmail: so.contactEmail,
+			itemName: so.products.itemName,
+			quantity: quantity,
+			unitPrice: unitPrice,
+			amount: `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+			status: so.status,
+			statusBg:
+				so.status === "Approved"
+					? "#dcfce7"
+					: so.status === "Received"
+						? "#dbeafe"
+						: so.status === "Delayed"
+							? "#fee2e2"
+							: "#ffedd5",
+			statusColor:
+				so.status === "Approved"
+					? "#15803d"
+					: so.status === "Received"
+						? "#2563eb"
+						: so.status === "Delayed"
+							? "#b91c1c"
+							: "#c2410c",
+		};
+	});
+
+	const rows = isSalesOrders ? formattedSOs : formattedPOs;
 
 	return (
 		<Paper
@@ -233,7 +248,7 @@ const OrdersTable = ({ purchaseOrders = [] }) => {
 					<TableBody>
 						{rows.map((row) => (
 							<TableRow
-								key={row.orderNumber}
+								key={row.originalId}
 								hover
 								sx={{
 									"&:hover": { backgroundColor: "rgba(248, 250, 252, 0.5)" },
@@ -301,6 +316,7 @@ const OrdersTable = ({ purchaseOrders = [] }) => {
 								</TableCell>
 								<TableCell sx={{ px: 3, py: 2, textAlign: "right" }}>
 									<IconButton
+										onClick={(event) => handleMenuClick(event, row)}
 										sx={{ color: "#94a3b8", "&:hover": { color: "#005faf" } }}>
 										<MaterialIcon name="more_vert" sx={{ fontSize: 18 }} />
 									</IconButton>
@@ -310,6 +326,25 @@ const OrdersTable = ({ purchaseOrders = [] }) => {
 					</TableBody>
 				</Table>
 			</Box>
+			<Menu
+				anchorEl={anchorEl}
+				open={Boolean(anchorEl)}
+				onClose={handleMenuClose}
+				transformOrigin={{ horizontal: "right", vertical: "top" }}
+				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}>
+				<MenuItem
+					onClick={handleDeleteOrder}
+					sx={{
+						fontSize: 14,
+						py: 1,
+						px: 2,
+						gap: 1,
+						color: "#dc2626",
+					}}>
+					<MaterialIcon name="delete" sx={{ fontSize: 20 }} />
+					Delete Order
+				</MenuItem>
+			</Menu>
 			<OrdersPagination />
 		</Paper>
 	);
