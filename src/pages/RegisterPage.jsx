@@ -11,23 +11,27 @@ const RegisterPage = () => {
 		name: "",
 		email: "",
 		password: "",
-		role: "admin"
+		role: "admin",
 	});
 
-	const handleLogin = async (e) => {
+	const handleRegister = async (e) => {
 		e.preventDefault();
 
 		try {
 			await api.post("/auth/register", form);
 			navigate("/login");
 		} catch (e) {
-			console.error(e.response?.data || e.message);
-			alert("Login failed");
+			// Try to extract the specific error message from the backend response
+			const errorMessage =
+				e.response?.data?.message ||
+				e.response?.data?.error ||
+				"Registration failed. Please try again.";
+			alert(typeof errorMessage === "string" ? errorMessage : "Registration failed");
 		}
 	};
 
 	const handleFormChange = (e) => {
-		setForm({...form, [e.target.name]: e.target.value})
+		setForm({ ...form, [e.target.name]: e.target.value });
 	};
 
 	return (
@@ -58,9 +62,29 @@ const RegisterPage = () => {
 					Register to access ERP Core.
 				</Typography>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-					<TextField label="Name" name="name" fullWidth size="small" onChange={handleFormChange} />
-					<TextField label="Email" name="email" type="email" fullWidth size="small" onChange={handleFormChange} />
-					<TextField label="Password" name="password" type="password" fullWidth size="small" onChange={handleFormChange} />
+					<TextField
+						label="Name"
+						name="name"
+						fullWidth
+						size="small"
+						onChange={handleFormChange}
+					/>
+					<TextField
+						label="Email"
+						name="email"
+						type="email"
+						fullWidth
+						size="small"
+						onChange={handleFormChange}
+					/>
+					<TextField
+						label="Password"
+						name="password"
+						type="password"
+						fullWidth
+						size="small"
+						onChange={handleFormChange}
+					/>
 					<TextField
 						label="Confirm Password"
 						type="password"
@@ -68,7 +92,7 @@ const RegisterPage = () => {
 						size="small"
 					/>
 					<Button
-						onClick={handleLogin}
+					onClick={handleRegister}
 						variant="contained"
 						disableElevation
 						sx={{
