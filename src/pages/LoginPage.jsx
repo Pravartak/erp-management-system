@@ -2,7 +2,8 @@ import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import api from "../backend/api/api";
+// import axios from "axios";
 import { customColors } from "../theme";
 
 const LoginPage = () => {
@@ -14,7 +15,7 @@ const LoginPage = () => {
 		e.preventDefault();
 
 		try {
-			const res = await axios.post("http://localhost:5000/api/auth/login", {
+			const res = await api.post("/login", {
 				email,
 				password,
 			});
