@@ -15,7 +15,7 @@ const LoginPage = () => {
 		e.preventDefault();
 
 		try {
-			const res = await api.post("/login", {
+			const res = await api.post("/auth/login", {
 				email,
 				password,
 			});
@@ -30,7 +30,10 @@ const LoginPage = () => {
 			navigate("/dashboard");
 		} catch (e) {
 			console.error(e.response?.data || e.message);
-			alert("Login failed");
+			
+			// Try to extract the specific error message from the backend response
+			const errorMessage = e.response?.data?.message || e.response?.data?.error || "Invalid credentials. Please try again.";
+			alert(typeof errorMessage === "string" ? errorMessage : "Login failed");
 		}
 	};
 
