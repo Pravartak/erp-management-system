@@ -17,7 +17,7 @@ import { customColors } from "../../theme";
 import MaterialIcon from "../MaterialIcon";
 import api from "../../backend/api/api";
 
-const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
+const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 	const textFieldStyles = useMemo(
 		() => ({
 			"& .MuiInputBase-root": {
@@ -62,8 +62,6 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 		setForm((currentForm) => ({
 			...currentForm,
 			[event.target.name]: event.target.value,
-
-			// For handling nested products fields
 			...(event.target.name === "itemName" && {
 				products: {
 					...currentForm.products,
@@ -98,7 +96,6 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 	}, [purchaseOrders]);
 
 	useEffect(() => {
-		// To assign a new orderNumber as soon as CreatePOModal is opened
 		if (form.orderNumber === "") {
 			form.orderNumber = `#PO-${nextPurchaseOrderNumber}`;
 		}
@@ -108,7 +105,7 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 		event.preventDefault();
 		try {
 			await api.post("/purchaseOrders", form);
-			await api.get("/purchaseOrders");
+			await onSuccess?.();
 		} catch (e) {
 			console.error(e);
 		}
@@ -155,22 +152,12 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 					maxWidth: "560px",
 				},
 			}}>
-			<DialogTitle
-				component="div"
-				sx={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-					borderBottom: `1px solid ${customColors["surface-container"]}`,
-					p: 2,
-				}}>
+			<DialogTitle component="div" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `1px solid ${customColors["surface-container"]}`, p: 2 }}>
 				<div>
 					<Typography variant="h6" sx={{ fontWeight: 700 }}>
 						Create Purchase Order
 					</Typography>
-					<Typography
-						variant="body2"
-						sx={{ color: customColors["on-surface-variant"], mt: 0.5 }}>
+					<Typography variant="body2" sx={{ color: customColors["on-surface-variant"], mt: 0.5 }}>
 						PO Number: {`#PO-${nextPurchaseOrderNumber}`}
 					</Typography>
 				</div>
@@ -193,64 +180,13 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 					<MaterialIcon name="close" />
 				</IconButton>
 			</DialogTitle>
-			<DialogContent
-				sx={{
-					p: 3,
-					display: "flex",
-					flexDirection: "column",
-					gap: 2.5,
-					mt: 1,
-				}}>
-				<TextField
-					autoFocus
-					required
-					margin="dense"
-					id="supplier"
-					name="supplier"
-					label="Supplier Name"
-					type="text"
-					fullWidth
-					variant="outlined"
-					sx={textFieldStyles}
-					value={form.supplier}
-					onChange={handleFormChange}
-				/>
-				<TextField
-					required
-					margin="dense"
-					id="contactEmail"
-					name="contactEmail"
-					label="Contact Email"
-					type="email"
-					fullWidth
-					variant="outlined"
-					sx={textFieldStyles}
-					value={form.contactEmail}
-					onChange={handleFormChange}
-				/>
-				<TextField
-					required
-					margin="dense"
-					id="itemName"
-					name="itemName"
-					label="Item Name"
-					type="text"
-					fullWidth
-					variant="outlined"
-					sx={textFieldStyles}
-					value={form.products.itemName}
-					onChange={handleFormChange}
-				/>
+			<DialogContent sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2.5, mt: 1 }}>
+				<TextField autoFocus required margin="dense" id="supplier" name="supplier" label="Supplier Name" type="text" fullWidth variant="outlined" sx={textFieldStyles} value={form.supplier} onChange={handleFormChange} />
+				<TextField required margin="dense" id="contactEmail" name="contactEmail" label="Contact Email" type="email" fullWidth variant="outlined" sx={textFieldStyles} value={form.contactEmail} onChange={handleFormChange} />
+				<TextField required margin="dense" id="itemName" name="itemName" label="Item Name" type="text" fullWidth variant="outlined" sx={textFieldStyles} value={form.products.itemName} onChange={handleFormChange} />
 				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
 					<InputLabel id="status-label">Status</InputLabel>
-					<Select
-						labelId="status-label"
-						id="status"
-						name="status"
-						label="Status"
-						value={form.status}
-						required
-						onChange={handleFormChange}>
+					<Select labelId="status-label" id="status" name="status" label="Status" value={form.status} required onChange={handleFormChange}>
 						<MenuItem value="Pending">Pending</MenuItem>
 						<MenuItem value="Approved">Approved</MenuItem>
 						<MenuItem value="Received">Received</MenuItem>
@@ -258,39 +194,11 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 					</Select>
 				</FormControl>
 				<div style={{ display: "flex", gap: 16 }}>
-					<TextField
-						required
-						margin="dense"
-						id="quantity"
-						name="quantity"
-						label="Quantity"
-						type="number"
-						fullWidth
-						variant="outlined"
-						sx={textFieldStyles}
-						value={form.products.quantity}
-						onChange={handleFormChange}
-					/>
-					<TextField
-						required
-						margin="dense"
-						id="unitPrice"
-						name="unitPrice"
-						label="Unit Price"
-						type="number"
-						fullWidth
-						variant="outlined"
-						sx={textFieldStyles}
-						value={form.products.unitPrice}
-						onChange={handleFormChange}
-					/>
+					<TextField required margin="dense" id="quantity" name="quantity" label="Quantity" type="number" fullWidth variant="outlined" sx={textFieldStyles} value={form.products.quantity} onChange={handleFormChange} />
+					<TextField required margin="dense" id="unitPrice" name="unitPrice" label="Unit Price" type="number" fullWidth variant="outlined" sx={textFieldStyles} value={form.products.unitPrice} onChange={handleFormChange} />
 				</div>
 			</DialogContent>
-			<DialogActions
-				sx={{
-					p: 2,
-					borderTop: `1px solid ${customColors["surface-container"]}`,
-				}}>
+			<DialogActions sx={{ p: 2, borderTop: `1px solid ${customColors["surface-container"]}` }}>
 				<Button
 					onClick={() => {
 						handleClose();
@@ -307,37 +215,10 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders }) => {
 						});
 					}}
 					variant="outlined"
-					sx={{
-						borderColor: customColors.outline,
-						color: customColors["on-surface"],
-						textTransform: "none",
-						fontWeight: 500,
-						borderRadius: 2,
-						px: 2,
-						py: 1,
-						"&:hover": {
-							backgroundColor: customColors["surface-container"],
-							borderColor: customColors.outline,
-						},
-					}}>
+					sx={{ borderColor: customColors.outline, color: customColors["on-surface"], textTransform: "none", fontWeight: 500, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["surface-container"], borderColor: customColors.outline } }}>
 					Cancel
 				</Button>
-				<Button
-					type="submit"
-					variant="contained"
-					disableElevation
-					sx={{
-						backgroundColor: customColors.primary,
-						color: customColors["on-primary"],
-						textTransform: "none",
-						fontWeight: 600,
-						borderRadius: 2,
-						px: 2,
-						py: 1,
-						"&:hover": {
-							backgroundColor: customColors["primary-dim"],
-						},
-					}}>
+				<Button type="submit" variant="contained" disableElevation sx={{ backgroundColor: customColors.primary, color: customColors["on-primary"], textTransform: "none", fontWeight: 600, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["primary-dim"] } }}>
 					Save PO
 				</Button>
 			</DialogActions>

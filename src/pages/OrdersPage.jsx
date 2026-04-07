@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Box, Grid } from "@mui/material";
 import { customColors } from "../theme";
 import MobileBottomNav from "../components/MobileBottomNav";
@@ -6,6 +6,7 @@ import SideNavBar from "../components/SideNavBar";
 import TopNavBar from "../components/TopNavBar";
 import CreatePOModal from "../components/orders/CreatePOModal";
 import CreateSOModal from "../components/orders/CreateSOModal";
+import UpdateOrdersModal from "../components/orders/UpdateOrdersModal";
 import OrdersAnalytics from "../components/orders/OrdersAnalytics";
 import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersLiveActivity from "../components/orders/OrdersLiveActivity";
@@ -16,31 +17,32 @@ import api from "../backend/api/api";
 const OrdersPage = () => {
 	const [isCreatePOModalOpen, setCreatePOModalOpen] = useState(false);
 	const [isCreateSOModalOpen, setCreateSOModalOpen] = useState(false);
+	const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
 	const [purchaseOrders, setPurchaseOrders] = useState([]);
 	const [salesOrders, setSalesOrders] = useState([]);
+	const [selectedOrder, setSelectedOrder] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+
+	const fetchOrders = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			const [purchaseOrdersResponse, salesOrdersResponse] = await Promise.all([
+				api.get("/purchaseOrders"),
+				api.get("/salesOrders"),
+			]);
+
+			setPurchaseOrders(purchaseOrdersResponse.data);
+			setSalesOrders(salesOrdersResponse.data);
+		} catch (e) {
+			console.error(e);
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
 
 	useEffect(() => {
-		const fetchPOs = async () => {
-			try {
-				const res = await api.get("/purchaseOrders");
-				setPurchaseOrders(res.data);
-			} catch (e) {
-				console.error(e);
-			}
-		};
-
-		const fetchSOs = async () => {
-			try {
-				const res = await api.get("/salesOrders");
-				setSalesOrders(res.data);
-			} catch (e) {
-				console.error(e);
-			}
-		};
-
-		fetchPOs();
-		fetchSOs();
-	}, []);
+		fetchOrders();
+	}, [fetchOrders]);
 
 	const handleDeletePurchaseOrder = async (id) => {
 		try {
@@ -51,6 +53,16 @@ const OrdersPage = () => {
 		} catch (e) {
 			console.error(e);
 		}
+	};
+
+	const handleUpdateOpenModal = (id) => {
+		setSelectedOrder(id);
+		setUpdateModalOpen(true);
+	};
+
+	const handleUpdateCloseModal = () => {
+		setSelectedOrder(null);
+		setUpdateModalOpen(false);
 	};
 
 	const handleDeleteSalesOrder = async (id) => {
@@ -96,11 +108,13 @@ const OrdersPage = () => {
 						open={isCreatePOModalOpen}
 						handleClose={() => setCreatePOModalOpen(false)}
 						purchaseOrders={purchaseOrders}
+						onSuccess={fetchOrders}
 					/>
 					<CreateSOModal
 						open={isCreateSOModalOpen}
 						handleClose={() => setCreateSOModalOpen(false)}
 						salesOrders={salesOrders}
+						onSuccess={fetchOrders}
 					/>
 					<OrdersSummary />
 					<OrdersTable
@@ -108,6 +122,14 @@ const OrdersPage = () => {
 						salesOrders={salesOrders}
 						onDeletePurchaseOrder={handleDeletePurchaseOrder}
 						onDeleteSalesOrder={handleDeleteSalesOrder}
+						onUpdateOrder={handleUpdateOpenModal}
+						isLoading={isLoading}
+					/>
+					<UpdateOrdersModal
+						open={isUpdateModalOpen}
+						handleClose={handleUpdateCloseModal}
+						id={selectedOrder}
+						onSuccess={fetchOrders}
 					/>
 					<Grid container spacing={3} sx={{ mt: 4 }}>
 						<Grid item xs={12} lg={8}>
