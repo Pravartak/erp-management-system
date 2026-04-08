@@ -15,7 +15,12 @@ import MaterialIcon from "../MaterialIcon";
 
 const CONDITION_OPTIONS = ["Good", "Partial", "Damaged"];
 
-const GrnLineItems = ({ orderDetails, lineItems = [], onLineItemsChange }) => {
+const GrnLineItems = ({
+	orderDetails,
+	lineItems = [],
+	onLineItemsChange,
+	onRemoveLineItem,
+}) => {
 	const handleItemChange = (index, field, value) => {
 		const nextItems = lineItems.map((item, itemIndex) => {
 			if (itemIndex !== index) {
@@ -60,7 +65,13 @@ const GrnLineItems = ({ orderDetails, lineItems = [], onLineItemsChange }) => {
 				<Table sx={{ minWidth: 700 }}>
 					<TableHead>
 						<TableRow sx={{ backgroundColor: "#f8fafc", color: "#475569" }}>
-							{["Item Name", "Qty Ordered", "Qty Received", "Condition", ""].map((head, index) => (
+							{[
+								"Item Name",
+								"Qty Ordered",
+								"Qty Received",
+								"Condition",
+								"",
+							].map((head, index) => (
 								<TableCell
 									key={head || index}
 									sx={{
@@ -81,36 +92,65 @@ const GrnLineItems = ({ orderDetails, lineItems = [], onLineItemsChange }) => {
 					<TableBody>
 						{lineItems.length > 0 ? (
 							lineItems.map((item, index) => (
-								<TableRow key={`${item.itemName}-${index}`} hover sx={{ "&:hover": { backgroundColor: "#f8fafc" } }}>
+								<TableRow
+									key={`${item.itemName}-${index}`}
+									hover
+									sx={{ "&:hover": { backgroundColor: "#f8fafc" } }}>
 									<TableCell sx={{ px: 3, py: 2 }}>
-										<Typography sx={{ fontWeight: 600, color: "#0f172a" }}>{item.itemName}</Typography>
-										<Typography sx={{ mt: 0.5, fontSize: 12, color: "#64748b" }}>
+										<Typography sx={{ fontWeight: 600, color: "#0f172a" }}>
+											{item.itemName}
+										</Typography>
+										<Typography
+											sx={{ mt: 0.5, fontSize: 12, color: "#64748b" }}>
 											{orderDetails?.orderNumber || "PO not linked"}
 										</Typography>
 									</TableCell>
-									<TableCell sx={{ px: 3, py: 2, color: "#64748b" }}>{item.quantityOrdered}</TableCell>
+									<TableCell sx={{ px: 3, py: 2, color: "#64748b" }}>
+										{item.quantityOrdered}
+									</TableCell>
 									<TableCell sx={{ px: 3, py: 2 }}>
 										<TextField
 											size="small"
 											type="number"
 											value={item.receivedQuantity}
-											inputProps={{ min: 0, style: { textAlign: "center", width: 60 } }}
+											inputProps={{
+												min: 0,
+												style: { textAlign: "center", width: 60 },
+											}}
 											sx={{
 												"& .MuiOutlinedInput-root": {
 													borderRadius: 1,
 													height: 32,
 												},
 											}}
-											onChange={(event) => handleItemChange(index, "receivedQuantity", event.target.value)}
+											onChange={(event) =>
+												handleItemChange(
+													index,
+													"receivedQuantity",
+													event.target.value,
+												)
+											}
 										/>
 									</TableCell>
 									<TableCell sx={{ px: 3, py: 2 }}>
 										<TextField
 											select
 											size="small"
-											value={CONDITION_OPTIONS.includes(item.condition) ? item.condition : "Good"}
-											sx={{ minWidth: 160, "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#fff" } }}
-											onChange={(event) => handleItemChange(index, "condition", event.target.value)}>
+											value={
+												CONDITION_OPTIONS.includes(item.condition)
+													? item.condition
+													: "Good"
+											}
+											sx={{
+												minWidth: 160,
+												"& .MuiOutlinedInput-root": {
+													borderRadius: 2,
+													backgroundColor: "#fff",
+												},
+											}}
+											onChange={(event) =>
+												handleItemChange(index, "condition", event.target.value)
+											}>
 											{CONDITION_OPTIONS.map((condition) => (
 												<MenuItem key={condition} value={condition}>
 													{condition}
@@ -119,7 +159,12 @@ const GrnLineItems = ({ orderDetails, lineItems = [], onLineItemsChange }) => {
 										</TextField>
 									</TableCell>
 									<TableCell sx={{ px: 3, py: 2, textAlign: "center" }}>
-										<IconButton sx={{ color: "#94a3b8", "&:hover": { color: "#9f403d" } }}>
+										<IconButton
+											onClick={() => onRemoveLineItem(index)}
+											sx={{
+												color: "#94a3b8",
+												"&:hover": { color: "#9f403d" },
+											}}>
 											<MaterialIcon name="delete" />
 										</IconButton>
 									</TableCell>
@@ -127,7 +172,9 @@ const GrnLineItems = ({ orderDetails, lineItems = [], onLineItemsChange }) => {
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={5} sx={{ px: 3, py: 5, textAlign: "center", color: "#64748b" }}>
+								<TableCell
+									colSpan={5}
+									sx={{ px: 3, py: 5, textAlign: "center", color: "#64748b" }}>
 									Search a purchase order to load line items.
 								</TableCell>
 							</TableRow>

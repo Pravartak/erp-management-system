@@ -1,5 +1,6 @@
 import GRN from "../models/GRN.js";
 import Product from "../models/Product.js";
+import PurchaseOrder from "../models/PurchaseOrders.js";
 
 export const createGRN = async (req, res) => {
     try {
@@ -33,6 +34,12 @@ export const createGRN = async (req, res) => {
 
                 await product.save();
             }
+        }
+
+        if (req.body.purchaseOrderId) {
+            await PurchaseOrder.findByIdAndUpdate(req.body.purchaseOrderId, {
+                status: "Received",
+            });
         }
 
         res.json(newGRN);

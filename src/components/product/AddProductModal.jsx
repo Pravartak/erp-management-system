@@ -18,6 +18,16 @@ import MaterialIcon from "../MaterialIcon";
 import { useState } from "react";
 import api from "../../backend/api/api.js";
 
+const getInitialForm = () => ({
+	title: "",
+	SKU: "",
+	category: "",
+	price: "",
+	stock: "",
+	supplierName: "",
+	contactEmail: "",
+});
+
 const AddProductModal = ({ open, handleClose, onSuccess }) => {
 	const textFieldStyles = {
 		"& .MuiInputBase-root": {
@@ -38,35 +48,43 @@ const AddProductModal = ({ open, handleClose, onSuccess }) => {
 		"& .MuiInputLabel-shrink": { color: customColors.primary },
 	};
 
-	const [form, setForm] = useState({
-		title: "",
-		SKU: "",
-		category: "",
-		price: "",
-		stock: "",
-	});
+	const [form, setForm] = useState(getInitialForm);
 
-	const handleFormChange = (e) => {
-		setForm({ ...form, [e.target.name]: e.target.value });
+	const handleFormChange = (event) => {
+		setForm((currentForm) => ({
+			...currentForm,
+			[event.target.name]: event.target.value,
+		}));
+	};
+
+	const resetForm = () => {
+		setForm(getInitialForm());
+	};
+
+	const handleModalClose = () => {
+		resetForm();
+		handleClose();
+	};
+
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+
+		try {
+			await api.post("/products", form);
+			await onSuccess?.();
+			handleModalClose();
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	return (
 		<Dialog
 			open={open}
-			onClose={handleClose}
+			onClose={handleModalClose}
 			PaperProps={{
 				component: "form",
-				onSubmit: async (event) => {
-					event.preventDefault();
-					try {
-						await api.post("/products", form);
-						await onSuccess?.();
-						setForm({ title: "", SKU: "", category: "", price: "", stock: "" });
-					} catch (e) {
-						console.error(e);
-					}
-					handleClose();
-				},
+				onSubmit: handleSubmit,
 				sx: {
 					backgroundColor: customColors["surface-container-lowest"],
 					color: customColors["on-surface"],
@@ -88,7 +106,9 @@ const AddProductModal = ({ open, handleClose, onSuccess }) => {
 				<Typography variant="h6" sx={{ fontWeight: 700 }}>
 					Add New Product
 				</Typography>
-				<IconButton onClick={handleClose} sx={{ color: customColors.outline }}>
+				<IconButton
+					onClick={handleModalClose}
+					sx={{ color: customColors.outline }}>
 					<MaterialIcon name="close" />
 				</IconButton>
 			</DialogTitle>
@@ -125,6 +145,32 @@ const AddProductModal = ({ open, handleClose, onSuccess }) => {
 					variant="outlined"
 					sx={textFieldStyles}
 					value={form.SKU}
+					onChange={handleFormChange}
+				/>
+				<TextField
+					required
+					margin="dense"
+					id="supplierName"
+					name="supplierName"
+					label="Supplier Name"
+					type="text"
+					fullWidth
+					variant="outlined"
+					sx={textFieldStyles}
+					value={form.supplierName}
+					onChange={handleFormChange}
+				/>
+				<TextField
+					required
+					margin="dense"
+					id="contactEmail"
+					name="contactEmail"
+					label="Contact Email"
+					type="email"
+					fullWidth
+					variant="outlined"
+					sx={textFieldStyles}
+					value={form.contactEmail}
 					onChange={handleFormChange}
 				/>
 				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
@@ -185,7 +231,7 @@ const AddProductModal = ({ open, handleClose, onSuccess }) => {
 					borderTop: `1px solid ${customColors["surface-container"]}`,
 				}}>
 				<Button
-					onClick={handleClose}
+					onClick={handleModalClose}
 					variant="outlined"
 					sx={{
 						borderColor: customColors.outline,
