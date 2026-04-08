@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const purchaseOrdersSchema = new mongoose.Schema({
     orderNumber: String,
     supplier: String,
+    productId: String,
+    SKU: String,
     contactEmail: String,
     products: {
         itemName: String,

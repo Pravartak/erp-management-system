@@ -9,51 +9,177 @@ import GrnInspectionNotes from "../components/grn/GrnInspectionNotes";
 import GrnLineItems from "../components/grn/GrnLineItems";
 import GrnPrimaryDetails from "../components/grn/GrnPrimaryDetails";
 import GrnReceiptInfo from "../components/grn/GrnReceiptInfo";
+import api from "../backend/api/api.js";
+import { useState } from "react";
 
-const GrnPage = () => (
-	<Box
-		sx={{
-			backgroundColor: customColors.background,
-			color: customColors["on-background"],
-			minHeight: "100vh",
-		}}>
-		<TopNavBar
-			searchVariant="dashboard"
-			searchPlaceholder="Search orders, items..."
-		/>
-		<SideNavBar activeLabel="GRN" />
+const getInitialGrnForm = () => ({
+	poRef: "",
+	receptionDate: "",
+	supplier: "",
+	productId: "",
+	SKU: "",
+	contactEmail: "",
+	purchaseOrderId: "",
+	purchaseOrderStatus: "",
+	lineItems: [],
+});
+
+const GrnPage = () => {
+	const [orderDetails, setOrderDetails] = useState(null);
+	const [completeForm, setCompleteForm] = useState(getInitialGrnForm);
+
+	const fetchPO = async (orderNumber) => {
+		const normalizedOrderNumber = orderNumber?.trim();
+		if (!normalizedOrderNumber) {
+			setOrderDetails(null);
+			setCompleteForm((currentForm) => ({
+				...currentForm,
+				poRef: "",
+				supplier: "",
+				productId: "",
+				SKU: "",
+				contactEmail: "",
+				purchaseOrderId: "",
+				purchaseOrderStatus: "",
+				lineItems: [],
+			}));
+			return;
+		}
+
+		try {
+			const [purchaseOrdersResponse, productsResponse] = await Promise.all([
+				api.get("/purchaseOrders"),
+				api.get("/products"),
+			]);
+			const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.orderNumber === normalizedOrderNumber) || null;
+			const matchedProduct = purchaseOrder
+				? productsResponse.data.find((product) => product._id === purchaseOrder.productId)
+					|| productsResponse.data.find((product) => product.title === purchaseOrder.products?.itemName)
+				: null;
+
+			setOrderDetails(purchaseOrder);
+			setCompleteForm((currentForm) => ({
+				...currentForm,
+				poRef: normalizedOrderNumber,
+				supplier: purchaseOrder?.supplier || matchedProduct?.supplierName || "",
+				productId: purchaseOrder?.productId || matchedProduct?._id || "",
+				SKU: purchaseOrder?.SKU || matchedProduct?.SKU || "",
+				contactEmail: purchaseOrder?.contactEmail || matchedProduct?.contactEmail || "",
+				purchaseOrderId: purchaseOrder?._id || "",
+				purchaseOrderStatus: purchaseOrder?.status || "",
+				lineItems: purchaseOrder
+					? [
+							{
+								itemName: purchaseOrder.products?.itemName || matchedProduct?.title || "",
+								quantityOrdered: Number(purchaseOrder.products?.quantity || 0),
+								receivedQuantity: Number(purchaseOrder.products?.quantity || 0),
+								condition: "Good",
+								unitPrice: Number(purchaseOrder.products?.unitPrice ?? matchedProduct?.price ?? 0),
+							},
+						]
+					: [],
+			}));
+		} catch (e) {
+			console.error(e);
+			setOrderDetails(null);
+		}
+	};
+
+	const handleGRNSubmit = async () => {
+		const payload = {
+			poRef: completeForm.poRef,
+			supplier: completeForm.supplier,
+			productId: completeForm.productId,
+			SKU: completeForm.SKU,
+			contactEmail: completeForm.contactEmail,
+			purchaseOrderId: completeForm.purchaseOrderId,
+			purchaseOrderStatus: completeForm.purchaseOrderStatus,
+			lineItems: completeForm.lineItems.map((item) => ({
+				itemName: item.itemName,
+				receivedQuantity: Number(item.receivedQuantity || 0),
+				condition: item.condition,
+				unitPrice: Number(item.unitPrice || 0),
+			})),
+		};
+
+		try {
+			const uploadedGRN = await api.post("/grn", payload);
+			console.log(uploadedGRN);
+			setOrderDetails(null);
+			setCompleteForm(getInitialGrnForm());
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const handlePrimaryDetailsChange = (field, value) => {
+		setCompleteForm((currentForm) => ({
+			...currentForm,
+			[field]: value,
+		}));
+	};
+
+	const handleLineItemsChange = (lineItems) => {
+		setCompleteForm((currentForm) => ({
+			...currentForm,
+			lineItems,
+		}));
+	};
+
+	return (
 		<Box
-			component="main"
-			sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh" }}>
+			sx={{
+				backgroundColor: customColors.background,
+				color: customColors["on-background"],
+				minHeight: "100vh",
+			}}>
+			<TopNavBar
+				searchVariant="dashboard"
+				searchPlaceholder="Search orders, items..."
+			/>
+			<SideNavBar activeLabel="GRN" />
 			<Box
-				sx={{
-					p: { xs: 3, lg: 5 },
-					maxWidth: 1280,
-					mx: "auto",
-					display: "flex",
-					flexDirection: "column",
-					gap: 2,
-				}}>
-				<GrnHeader />
-				<Grid container spacing={3}>
-					<Grid item xs={12} lg={8}>
-						<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-							<GrnPrimaryDetails />
-							<GrnLineItems />
-						</Box>
+				component="main"
+				sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh" }}>
+				<Box
+					sx={{
+						p: { xs: 3, lg: 5 },
+						maxWidth: 1280,
+						mx: "auto",
+						display: "flex",
+						flexDirection: "column",
+						gap: 2,
+					}}>
+					<GrnHeader submitGRN={handleGRNSubmit} />
+					<Grid container spacing={3}>
+						<Grid item xs={12} lg={8}>
+							<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+								<GrnPrimaryDetails
+									giveOrderNumber={fetchPO}
+									orderDetails={orderDetails}
+									completeForm={completeForm}
+									onFormChange={handlePrimaryDetailsChange}
+								/>
+								<GrnLineItems
+									orderDetails={orderDetails}
+									lineItems={completeForm.lineItems}
+									onLineItemsChange={handleLineItemsChange}
+								/>
+							</Box>
+						</Grid>
+						<Grid item xs={12} lg={4}>
+							<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+								<GrnInspectionNotes />
+								<GrnDeliveryDocuments />
+								<GrnReceiptInfo />
+							</Box>
+						</Grid>
 					</Grid>
-					<Grid item xs={12} lg={4}>
-						<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-							<GrnInspectionNotes />
-							<GrnDeliveryDocuments />
-							<GrnReceiptInfo />
-						</Box>
-					</Grid>
-				</Grid>
+				</Box>
 			</Box>
+			<MobileBottomNav activeLabel="Invoices" />
 		</Box>
-		<MobileBottomNav activeLabel="Invoices" />
-	</Box>
-);
+	);
+};
 
 export default GrnPage;

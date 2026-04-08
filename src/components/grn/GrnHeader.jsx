@@ -2,7 +2,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { customColors } from "../../theme";
 import MaterialIcon from "../MaterialIcon";
 
-const GrnHeader = () => (
+const GrnHeader = ({ submitGRN }) => (
 	<Box
 		sx={{
 			display: "flex",
@@ -14,15 +14,17 @@ const GrnHeader = () => (
 		}}>
 		<Box>
 			<Typography
-        variant="h5"
+				variant="h5"
 				sx={{
 					fontWeight: 800,
 					color: "#0f172a",
-          letterSpacing: "-0.02em",
+					letterSpacing: "-0.02em",
 				}}>
 				Create Goods Received Note
 			</Typography>
-			<Typography variant="body2" sx={{ color: customColors["on-surface-variant"] }}>
+			<Typography
+				variant="body2"
+				sx={{ color: customColors["on-surface-variant"] }}>
 				Verify and record incoming stock against purchase orders.
 			</Typography>
 		</Box>
@@ -55,7 +57,8 @@ const GrnHeader = () => (
 					color: customColors["on-primary"],
 					boxShadow: "0px 10px 20px rgba(0, 95, 175, 0.2)",
 					"&:hover": { backgroundColor: customColors["primary-dim"] },
-				}}>
+				}}
+				onClick={submitGRN}>
 				Submit GRN
 			</Button>
 		</Box>

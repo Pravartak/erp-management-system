@@ -6,6 +6,8 @@ const productSchema = new mongoose.Schema({
     category: String,
     price: Number,
     stock: Number,
+    supplierName: String,
+    contactEmail: String,
 }, { timestamps: true });
 
 export default mongoose.model("Product", productSchema);

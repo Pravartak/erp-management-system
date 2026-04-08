@@ -20,6 +20,8 @@ import api from "../../backend/api/api";
 const getInitialPurchaseOrderForm = () => ({
 	orderNumber: "",
 	supplier: "",
+	productId: "",
+	SKU: "",
 	contactEmail: "",
 	products: {
 		itemName: "",
@@ -72,6 +74,7 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 
 	const [poForm, setPOForm] = useState(getInitialPurchaseOrderForm);
 	const [soForm, setSOForm] = useState(getInitialSalesOrderForm);
+	const [products, setProducts] = useState([]);
 
 	const isSalesOrder = id?.type === "sales";
 
@@ -79,6 +82,24 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 		setPOForm(getInitialPurchaseOrderForm());
 		setSOForm(getInitialSalesOrderForm());
 	};
+
+	useEffect(() => {
+		if (!open || isSalesOrder) {
+			return;
+		}
+
+		const loadProducts = async () => {
+			try {
+				const response = await api.get("/products");
+				setProducts(response.data || []);
+			} catch (e) {
+				console.error(e);
+				setProducts([]);
+			}
+		};
+
+		loadProducts();
+	}, [open, isSalesOrder]);
 
 	useEffect(() => {
 		if (!open || !id) {
@@ -103,6 +124,8 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 		setPOForm({
 			orderNumber: id.orderNumber || "",
 			supplier: id.supplier || "",
+			productId: id.productId || "",
+			SKU: id.SKU || "",
 			contactEmail: id.contactEmail || "",
 			products: {
 				itemName: id.itemName || "",
@@ -145,12 +168,6 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 		setPOForm((currentForm) => ({
 			...currentForm,
 			[name]: value,
-			...(name === "itemName" && {
-				products: {
-					...currentForm.products,
-					itemName: value,
-				},
-			}),
 			...(name === "quantity" && {
 				products: {
 					...currentForm.products,
@@ -163,6 +180,21 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 					unitPrice: value,
 				},
 			}),
+		}));
+	};
+
+	const handlePurchaseProductChange = (event) => {
+		const selectedProduct = products.find((product) => product._id === event.target.value);
+
+		setPOForm((currentForm) => ({
+			...currentForm,
+			productId: selectedProduct?._id || "",
+			SKU: selectedProduct?.SKU || "",
+			products: {
+				...currentForm.products,
+				itemName: selectedProduct?.title || "",
+				unitPrice: selectedProduct?.price ?? currentForm.products.unitPrice,
+			},
 		}));
 	};
 
@@ -192,6 +224,9 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 			console.error(e);
 		}
 	};
+
+	const selectedPurchaseProductMissing =
+		!isSalesOrder && poForm.productId && !products.some((product) => product._id === poForm.productId);
 
 	return (
 		<Dialog
@@ -225,7 +260,27 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 			<DialogContent sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2.5, mt: 1 }}>
 				<TextField autoFocus required margin="dense" id={isSalesOrder ? "customer" : "supplier"} name={isSalesOrder ? "customer" : "supplier"} label={isSalesOrder ? "Customer Name" : "Supplier Name"} type="text" fullWidth variant="outlined" sx={textFieldStyles} value={isSalesOrder ? soForm.customer : poForm.supplier} onChange={handleFormChange} />
 				<TextField required margin="dense" id="contactEmail" name="contactEmail" label="Contact Email" type="email" fullWidth variant="outlined" sx={textFieldStyles} value={isSalesOrder ? soForm.contactEmail : poForm.contactEmail} onChange={handleFormChange} />
-				<TextField required margin="dense" id="itemName" name="itemName" label="Item Name" type="text" fullWidth variant="outlined" sx={textFieldStyles} value={isSalesOrder ? soForm.products.itemName : poForm.products.itemName} onChange={handleFormChange} />
+				{isSalesOrder ? (
+					<TextField required margin="dense" id="itemName" name="itemName" label="Item Name" type="text" fullWidth variant="outlined" sx={textFieldStyles} value={soForm.products.itemName} onChange={handleFormChange} />
+				) : (
+					<>
+						<FormControl fullWidth margin="dense" sx={textFieldStyles}>
+							<InputLabel id="update-po-product-label">Product</InputLabel>
+							<Select labelId="update-po-product-label" id="productId" name="productId" label="Product" value={poForm.productId} required onChange={handlePurchaseProductChange}>
+								{selectedPurchaseProductMissing ? (
+									<MenuItem value={poForm.productId}>{poForm.products.itemName || "Current Product"}</MenuItem>
+								) : null}
+								{products.map((product) => (
+									<MenuItem key={product._id} value={product._id}>
+										{product.title} {product.SKU ? `(${product.SKU})` : ""}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+						<TextField margin="dense" label="SKU" fullWidth variant="outlined" sx={textFieldStyles} value={poForm.SKU} InputProps={{ readOnly: true }} />
+						<TextField margin="dense" label="Item Name" fullWidth variant="outlined" sx={textFieldStyles} value={poForm.products.itemName} InputProps={{ readOnly: true }} />
+					</>
+				)}
 				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
 					<InputLabel id="status-label">Status</InputLabel>
 					<Select labelId="status-label" id="status" name="status" label="Status" value={isSalesOrder ? soForm.status : poForm.status} required onChange={handleFormChange}>
@@ -244,7 +299,7 @@ const UpdateOrdersModal = ({ open, handleClose, id, onSuccess }) => {
 				<Button onClick={handleModalClose} variant="outlined" sx={{ borderColor: customColors.outline, color: customColors["on-surface"], textTransform: "none", fontWeight: 500, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["surface-container"], borderColor: customColors.outline } }}>
 					Cancel
 				</Button>
-				<Button type="submit" variant="contained" disableElevation sx={{ backgroundColor: customColors.primary, color: customColors["on-primary"], textTransform: "none", fontWeight: 600, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["primary-dim"] } }}>
+				<Button type="submit" variant="contained" disableElevation disabled={!isSalesOrder && !poForm.productId} sx={{ backgroundColor: customColors.primary, color: customColors["on-primary"], textTransform: "none", fontWeight: 600, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["primary-dim"] } }}>
 					{isSalesOrder ? "Update SO" : "Update PO"}
 				</Button>
 			</DialogActions>

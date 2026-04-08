@@ -118,6 +118,8 @@ const OrdersTable = ({
 					initialsBg: "#dbeafe",
 					initialsColor: "#1d4ed8",
 					contactEmail: po.contactEmail,
+					productId: po.productId,
+					SKU: po.SKU,
 					itemName: po.products.itemName,
 					quantity,
 					unitPrice,
@@ -230,23 +232,8 @@ const OrdersTable = ({
 	};
 
 	return (
-		<Paper
-			elevation={0}
-			sx={{
-				borderRadius: 2,
-				border: "1px solid #e2e8f0",
-				backgroundColor: "#fff",
-				boxShadow: "0px 8px 16px rgba(15, 23, 42, 0.05)",
-				overflow: "hidden",
-			}}>
-			<Box
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					borderBottom: "1px solid #e2e8f0",
-					backgroundColor: "rgba(248, 250, 252, 0.5)",
-					px: 3,
-				}}>
+		<Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e2e8f0", backgroundColor: "#fff", boxShadow: "0px 8px 16px rgba(15, 23, 42, 0.05)", overflow: "hidden" }}>
+			<Box sx={{ display: "flex", alignItems: "center", borderBottom: "1px solid #e2e8f0", backgroundColor: "rgba(248, 250, 252, 0.5)", px: 3 }}>
 				<Button onClick={() => handleTabChange("sales")} sx={tabButtonStyles(isSalesOrders)}>
 					Sales Orders
 				</Button>
@@ -267,18 +254,7 @@ const OrdersTable = ({
 					<TableHead>
 						<TableRow sx={{ backgroundColor: "rgba(248, 250, 252, 0.3)" }}>
 							{["Order ID", "Date", entityLabel, "Item Name", "Amount", "Status", ""].map((head, index) => (
-								<TableCell
-									key={index}
-									sx={{
-										px: 3,
-										py: 2,
-										fontSize: 11,
-										fontWeight: 700,
-										textTransform: "uppercase",
-										letterSpacing: "0.2em",
-										color: "#64748b",
-										textAlign: index === 6 ? "right" : "left",
-									}}>
+								<TableCell key={index} sx={{ px: 3, py: 2, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "#64748b", textAlign: index === 6 ? "right" : "left" }}>
 									{head}
 								</TableCell>
 							))}
@@ -293,7 +269,9 @@ const OrdersTable = ({
 											{row.orderNumber}
 										</Box>
 									</TableCell>
-									<TableCell sx={{ px: 3, py: 2, fontSize: 14, color: "#64748b" }}>{row.date}</TableCell>
+									<TableCell sx={{ px: 3, py: 2, fontSize: 14, color: "#64748b" }}>
+										{row.date}
+									</TableCell>
 									<TableCell sx={{ px: 3, py: 2 }}>
 										<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 											<Box sx={{ width: 32, height: 32, borderRadius: 1, backgroundColor: row.initialsBg, color: row.initialsColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>
@@ -304,8 +282,12 @@ const OrdersTable = ({
 											</Box>
 										</Box>
 									</TableCell>
-									<TableCell sx={{ px: 3, py: 2, fontSize: 14, color: "#64748b" }}>{row?.itemName || "N/A"}</TableCell>
-									<TableCell sx={{ px: 3, py: 2, fontSize: 14, fontWeight: 600 }}>{row.amount}</TableCell>
+									<TableCell sx={{ px: 3, py: 2, fontSize: 14, color: "#64748b" }}>
+										{row?.itemName || "N/A"}
+									</TableCell>
+									<TableCell sx={{ px: 3, py: 2, fontSize: 14, fontWeight: 600 }}>
+										{row.amount}
+									</TableCell>
 									<TableCell sx={{ px: 3, py: 2 }}>
 										<Box sx={{ display: "inline-flex", alignItems: "center", px: 1.5, py: 0.5, borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", backgroundColor: row.statusBg, color: row.statusColor }}>
 											{row.status}
@@ -338,13 +320,7 @@ const OrdersTable = ({
 					Delete Order
 				</MenuItem>
 			</Menu>
-			<OrdersPagination
-				page={currentPage}
-				pageSize={PAGE_SIZE}
-				totalCount={rows.length}
-				onPageChange={handlePageChange}
-				label={isSalesOrders ? "sales orders" : "purchase orders"}
-			/>
+			<OrdersPagination page={currentPage} pageSize={PAGE_SIZE} totalCount={rows.length} onPageChange={handlePageChange} label={isSalesOrders ? "sales orders" : "purchase orders"} />
 		</Paper>
 	);
 };
