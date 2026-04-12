@@ -10,11 +10,30 @@ const formatDate = (dateValue) => {
 };
 
 const InvoicesHistory = ({ invoices = [] }) => {
-	const sortedInvoices = [...invoices].sort((a, b) => new Date(b.createdAt || b.invoiceDate) - new Date(a.createdAt || a.invoiceDate));
+	const sortedInvoices = [...invoices].sort(
+		(a, b) =>
+			new Date(b.createdAt || b.invoiceDate) -
+			new Date(a.createdAt || a.invoiceDate),
+	);
 
 	return (
-		<Paper elevation={0} sx={{ backgroundColor: "#fff", borderRadius: 2, border: "1px solid #e2e8f0", p: 3 }}>
-			<Typography sx={{ fontWeight: 700, color: "#0f172a", mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
+		<Paper
+			elevation={0}
+			sx={{
+				backgroundColor: "#fff",
+				borderRadius: 2,
+				border: "1px solid #e2e8f0",
+				p: 3,
+			}}>
+			<Typography
+				sx={{
+					fontWeight: 700,
+					color: "#0f172a",
+					mb: 3,
+					display: "flex",
+					alignItems: "center",
+					gap: 1,
+				}}>
 				<MaterialIcon name="history" sx={{ color: "#94a3b8", fontSize: 20 }} />
 				Saved Invoices
 			</Typography>
@@ -35,9 +54,9 @@ const InvoicesHistory = ({ invoices = [] }) => {
 								display: "flex",
 								flexDirection: "column",
 								gap: 0.5,
-							}}
-						>
-							<Typography sx={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
+							}}>
+							<Typography
+								sx={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
 								{invoice.invoiceNumber || "Invoice"}
 							</Typography>
 							<Typography sx={{ fontSize: 12, color: "#475569" }}>
@@ -49,7 +68,8 @@ const InvoicesHistory = ({ invoices = [] }) => {
 							<Typography sx={{ fontSize: 11, color: "#94a3b8" }}>
 								{formatDate(invoice.createdAt || invoice.invoiceDate)}
 							</Typography>
-							<Typography sx={{ fontSize: 11, fontWeight: 600, color: "#2563eb" }}>
+							<Typography
+								sx={{ fontSize: 11, fontWeight: 600, color: "#2563eb" }}>
 								{invoice.status || "Draft"}
 							</Typography>
 						</Box>

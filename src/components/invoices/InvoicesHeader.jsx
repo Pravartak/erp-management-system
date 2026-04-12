@@ -53,11 +53,16 @@ const InvoicesHeader = ({
 						onSalesOrderChange?.(event.target.value);
 						fetchSODetails(event.target.value);
 					}}>
-					{salesOrders.map((salesOrder) => (
-						<MenuItem key={salesOrder._id} value={salesOrder._id}>
-							{salesOrder.products?.itemName || "Unnamed item"}
-						</MenuItem>
-					))}
+					{salesOrders.map((salesOrder) => {
+						const productNames = Array.isArray(salesOrder.products)
+							? salesOrder.products.map((p) => p?.itemName).filter(Boolean).join(", ")
+							: salesOrder.products?.itemName;
+						return (
+							<MenuItem key={salesOrder._id} value={salesOrder._id}>
+								{productNames || "Unnamed item"}
+							</MenuItem>
+						);
+					})}
 				</Select>
 			</FormControl>
 		</Box>
