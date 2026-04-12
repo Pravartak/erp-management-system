@@ -158,8 +158,8 @@ const OrdersTable = ({
 					.join("")
 					.toUpperCase();
 
-				const quantity = Number(so.products.quantity || 0);
-				const unitPrice = Number(so.products.unitPrice || 0);
+				const quantity = Number(so.products[0].quantity || 0);
+				const unitPrice = Number(so.products[0].unitPrice || 0);
 				const amount = quantity * unitPrice;
 
 				return {
@@ -172,7 +172,7 @@ const OrdersTable = ({
 					initialsBg: "#dbeafe",
 					initialsColor: "#1d4ed8",
 					contactEmail: so.contactEmail,
-					itemName: so.products.itemName,
+					itemName: so.products[0].itemName,
 					quantity,
 					unitPrice,
 					amount: `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,

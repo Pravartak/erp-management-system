@@ -8,6 +8,7 @@ import userRoutes from "./routes/userRoutes.js";
 import poRoutes from "./routes/poRoutes.js";
 import soRoutes from "./routes/soRoutes.js";
 import grnRoutes from "./routes/grnRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
 import { authorize, protect } from "./middleware/authMiddleware.js";
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/purchaseOrders", poRoutes);
 app.use("/api/salesOrders", soRoutes);
 app.use("/api/grn", grnRoutes);
+app.use("/api/invoices", invoiceRoutes)
 
 // MongoDB Connect
 mongoose

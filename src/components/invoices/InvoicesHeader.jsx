@@ -1,10 +1,24 @@
-import { Box, Button, Typography } from "@mui/material";
+import {
+	Box,
+	Button,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
+	Typography,
+} from "@mui/material";
 import { customColors } from "../../theme";
 import MaterialIcon from "../MaterialIcon";
 
-const InvoicesHeader = () => (
+const InvoicesHeader = ({
+	salesOrders,
+	selectedSalesOrder,
+	onSalesOrderChange,
+	fetchSODetails,
+	saveInvoice,
+}) => (
 	<Box
-  component="section"
+		component="section"
 		sx={{
 			display: "flex",
 			flexDirection: { xs: "column", md: "row" },
@@ -13,36 +27,46 @@ const InvoicesHeader = () => (
 			gap: 2,
 			mb: 4,
 		}}>
-		<Typography
-    variant="h5"
+		<Box
 			sx={{
-				fontWeight: 800,
-				color: "#0f172a",
-				letterSpacing: "-0.02em",
+				display: "flex",
+				flexDirection: "column",
+				gap: 2,
+				minWidth: { xs: "100%", md: 320 },
 			}}>
-			Invoice Preview
-		</Typography>
-		<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-			<Button
-				variant="outlined"
-				startIcon={<MaterialIcon name="download" sx={{ fontSize: 18 }} />}
+			<Typography
+				variant="h5"
 				sx={{
-					backgroundColor: "#fff",
-					borderColor: "#e2e8f0",
-					color: "#475569",
-					textTransform: "none",
-					fontWeight: 600,
-					borderRadius: 2,
-					px: 2,
-					py: 1,
-					"&:hover": { backgroundColor: "#f8fafc", borderColor: "#e2e8f0" },
+					fontWeight: 800,
+					color: "#0f172a",
+					letterSpacing: "-0.02em",
 				}}>
-				Download PDF
-			</Button>
+				Invoice Preview
+			</Typography>
+			<FormControl size="small" fullWidth>
+				<InputLabel id="sales-order-select-label">Sales Order</InputLabel>
+				<Select
+					labelId="sales-order-select-label"
+					value={selectedSalesOrder}
+					label="Sales Order"
+					onChange={(event) => {
+						onSalesOrderChange?.(event.target.value);
+						fetchSODetails(event.target.value);
+					}}>
+					{salesOrders.map((salesOrder) => (
+						<MenuItem key={salesOrder._id} value={salesOrder._id}>
+							{salesOrder.products?.itemName || "Unnamed item"}
+						</MenuItem>
+					))}
+				</Select>
+			</FormControl>
+		</Box>
+		<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 			<Button
 				variant="contained"
 				disableElevation
-				startIcon={<MaterialIcon name="send" sx={{ fontSize: 18 }} />}
+				startIcon={<MaterialIcon name="save" sx={{ fontSize: 18 }} />}
+				onClick={saveInvoice}
 				sx={{
 					backgroundColor: customColors.primary,
 					color: customColors["on-primary"],
@@ -54,7 +78,7 @@ const InvoicesHeader = () => (
 					boxShadow: "0px 10px 20px rgba(0, 95, 175, 0.2)",
 					"&:hover": { backgroundColor: customColors["primary-dim"] },
 				}}>
-				Send via Email
+				Save Invoice
 			</Button>
 		</Box>
 	</Box>
