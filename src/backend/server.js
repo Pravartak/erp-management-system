@@ -10,6 +10,10 @@ import soRoutes from "./routes/soRoutes.js";
 import grnRoutes from "./routes/grnRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
 import { authorize, protect } from "./middleware/authMiddleware.js";
+import Product from "./models/Product.js";
+import SalesOrders from "./models/SalesOrders.js";
+import PurchaseOrders from "./models/PurchaseOrders.js";
+import Invoice from "./models/Invoice.js";
 
 dotenv.config();
 
@@ -26,13 +30,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/purchaseOrders", poRoutes);
 app.use("/api/salesOrders", soRoutes);
 app.use("/api/grn", grnRoutes);
-app.use("/api/invoices", invoiceRoutes)
+app.use("/api/invoices", invoiceRoutes);
 
 // MongoDB Connect
-mongoose
-	.connect(process.env.MONGODB_URI)
-	.then(() => console.log("MongoDB Connected."))
-	.catch((e) => console.log(e));
+mongoose.connect(process.env.MONGODB_URI).then(() => console.log("MongoDB Connected.")).catch((e) => console.log(e));
 
 app.get("/api/protected", protect, (req, res) => {
 	res.json({
@@ -43,9 +44,37 @@ app.get("/api/protected", protect, (req, res) => {
 
 app.get("/api/admin", protect, authorize("admin"), (req, res) => {
 	res.json({
-        msg: "Welcome Admin",
-        user: req.user
-    });
+		msg: "Welcome Admin",
+		user: req.user,
+	});
+});
+
+app.get("/api/dashboard", async (req, res) => {
+	try {
+		const totalProducts = await Product.countDocuments();
+		const totalSalesOrders = await SalesOrders.countDocuments();
+		const totalPurchaseOrders = await PurchaseOrders.countDocuments();
+
+		const revenueData = await Invoice.aggregate([
+			{
+				$group: {
+					_id: null,
+					total: { $sum: "$totalAmount" }
+				}
+			}
+		]);
+
+		const totalRevenue = revenueData[0]?.total || 0;
+
+		res.json({
+			totalProducts,
+			totalSalesOrders,
+			totalPurchaseOrders,
+			totalRevenue
+		});
+	} catch (e) {
+		res.status(500).json({ msg: e.message });
+	}
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
