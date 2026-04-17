@@ -32,17 +32,54 @@ function App() {
 					</ProtectedRoute>
 				}
 			/>
-			<Route path="/products" element={<ProductManagementPage />} />
-			<Route path="/directory" element={<DirectoryPage />} />
-			<Route path="/orders" element={<OrdersPage />} />
-			<Route path="/grn" element={<GrnPage />} />
-			<Route path="/invoices" element={<InvoicesPage />} />
+			<Route
+				path="/products"
+				element={
+					<ProtectedRoute>
+						<ProductManagementPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/directory"
+				element={
+					<ProtectedRoute>
+						<DirectoryPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/orders"
+				element={
+					<ProtectedRoute>
+						<OrdersPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/grn"
+				element={
+					<ProtectedRoute>
+						<GrnPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/invoices"
+				element={
+					<ProtectedRoute>
+						<InvoicesPage />
+					</ProtectedRoute>
+				}
+			/>
 			<Route
 				path="/users"
 				element={
-					<AdminRoute>
-						<UsersPage />
-					</AdminRoute>
+					<ProtectedRoute>
+						<AdminRoute>
+							<UsersPage />
+						</AdminRoute>
+					</ProtectedRoute>
 				}
 			/>
 		</Routes>

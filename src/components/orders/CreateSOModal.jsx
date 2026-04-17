@@ -17,6 +17,18 @@ import { customColors } from "../../theme";
 import MaterialIcon from "../MaterialIcon";
 import api from "../../backend/api/api";
 
+const getInitialSalesOrderForm = () => ({
+	orderNumber: "",
+	customer: "",
+	contactEmail: "",
+	products: {
+		itemName: "",
+		quantity: "",
+		unitPrice: "",
+	},
+	status: "Pending",
+});
+
 const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 	const textFieldStyles = useMemo(
 		() => ({
@@ -46,42 +58,32 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 		[],
 	);
 
-	const [form, setForm] = useState({
-		orderNumber: "",
-		customer: "",
-		contactEmail: "",
-		products: {
-			itemName: "",
-			quantity: "",
-			unitPrice: "",
-		},
-		status: "Pending",
-	});
+	const [form, setForm] = useState(getInitialSalesOrderForm);
+	const [products, setProducts] = useState([]);
+	const [selectedProductId, setSelectedProductId] = useState("");
 
-	const handleFormChange = (event) => {
-		setForm((currentForm) => ({
-			...currentForm,
-			[event.target.name]: event.target.value,
-			...(event.target.name === "itemName" && {
-				products: {
-					...currentForm.products,
-					itemName: event.target.value,
-				},
-			}),
-			...(event.target.name === "quantity" && {
-				products: {
-					...currentForm.products,
-					quantity: event.target.value,
-				},
-			}),
-			...(event.target.name === "unitPrice" && {
-				products: {
-					...currentForm.products,
-					unitPrice: event.target.value,
-				},
-			}),
-		}));
+	const resetForm = () => {
+		setForm(getInitialSalesOrderForm());
+		setSelectedProductId("");
 	};
+
+	useEffect(() => {
+		if (!open) {
+			return;
+		}
+
+		const loadProducts = async () => {
+			try {
+				const response = await api.get("/products");
+				setProducts(response.data || []);
+			} catch (e) {
+				console.error(e);
+				setProducts([]);
+			}
+		};
+
+		loadProducts();
+	}, [open]);
 
 	const nextSalesOrderNumber = useMemo(() => {
 		try {
@@ -92,54 +94,83 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 			return highest + 1;
 		} catch (e) {
 			console.error(e);
+			return 1;
 		}
 	}, [salesOrders]);
 
 	useEffect(() => {
-		if (form.orderNumber === "") {
-			form.orderNumber = `#SO-${nextSalesOrderNumber}`;
+		if (!open) {
+			return;
 		}
-	});
+
+		setForm((currentForm) =>
+			currentForm.orderNumber
+				? currentForm
+				: {
+						...currentForm,
+						orderNumber: `#SO-${nextSalesOrderNumber}`,
+					},
+		);
+	}, [open, nextSalesOrderNumber]);
+
+	const handleFormChange = (event) => {
+		const { name, value } = event.target;
+
+		setForm((currentForm) => ({
+			...currentForm,
+			[name]: value,
+			...(name === "quantity" && {
+				products: {
+					...currentForm.products,
+					quantity: value,
+				},
+			}),
+			...(name === "unitPrice" && {
+				products: {
+					...currentForm.products,
+					unitPrice: value,
+				},
+			}),
+		}));
+	};
+
+	const handleProductChange = (event) => {
+		const nextProductId = event.target.value;
+		const selectedProduct = products.find((product) => product._id === nextProductId);
+
+		setSelectedProductId(nextProductId);
+		setForm((currentForm) => ({
+			...currentForm,
+			products: {
+				...currentForm.products,
+				itemName: selectedProduct?.title || "",
+				unitPrice: selectedProduct?.price ?? currentForm.products.unitPrice,
+			},
+		}));
+	};
+
+	const handleModalClose = () => {
+		resetForm();
+		handleClose();
+	};
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+
 		try {
 			await api.post("/salesOrders", form);
 			await onSuccess?.();
+			resetForm();
+			handleClose();
 		} catch (e) {
 			console.error(e);
 		}
-		setForm({
-			orderNumber: "",
-			customer: "",
-			contactEmail: "",
-			products: {
-				itemName: "",
-				quantity: "",
-				unitPrice: "",
-			},
-			status: "Pending",
-		});
-		handleClose();
 	};
 
 	return (
 		<Dialog
 			open={open}
-			onClose={() => {
-				handleClose();
-				setForm({
-					orderNumber: "",
-					customer: "",
-					contactEmail: "",
-					products: {
-						itemName: "",
-						quantity: "",
-						unitPrice: "",
-					},
-					status: "Pending",
-				});
-			}}
+			onClose={handleModalClose}
 			PaperProps={{
 				component: "form",
 				onSubmit: handleSubmit,
@@ -171,22 +202,7 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 						SO Number: {`#SO-${nextSalesOrderNumber}`}
 					</Typography>
 				</div>
-				<IconButton
-					onClick={() => {
-						handleClose();
-						setForm({
-							orderNumber: "",
-							customer: "",
-							contactEmail: "",
-							products: {
-								itemName: "",
-								quantity: "",
-								unitPrice: "",
-							},
-							status: "Pending",
-						});
-					}}
-					sx={{ color: customColors.outline }}>
+				<IconButton onClick={handleModalClose} sx={{ color: customColors.outline }}>
 					<MaterialIcon name="close" />
 				</IconButton>
 			</DialogTitle>
@@ -225,18 +241,37 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 					value={form.contactEmail}
 					onChange={handleFormChange}
 				/>
+				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
+					<InputLabel id="so-product-label">Product</InputLabel>
+					<Select
+						labelId="so-product-label"
+						id="selectedProductId"
+						name="selectedProductId"
+						label="Product"
+						value={selectedProductId}
+						required
+						onChange={handleProductChange}>
+						{products.length > 0 ? (
+							products.map((product) => (
+								<MenuItem key={product._id} value={product._id}>
+									{product.title} {product.SKU ? `(${product.SKU})` : ""}
+								</MenuItem>
+							))
+						) : (
+							<MenuItem value="" disabled>
+								No products available
+							</MenuItem>
+						)}
+					</Select>
+				</FormControl>
 				<TextField
-					required
 					margin="dense"
-					id="itemName"
-					name="itemName"
 					label="Item Name"
-					type="text"
 					fullWidth
 					variant="outlined"
 					sx={textFieldStyles}
 					value={form.products.itemName}
-					onChange={handleFormChange}
+					InputProps={{ readOnly: true }}
 				/>
 				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
 					<InputLabel id="status-label">Status</InputLabel>
@@ -289,20 +324,7 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 					borderTop: `1px solid ${customColors["surface-container"]}`,
 				}}>
 				<Button
-					onClick={() => {
-						handleClose();
-						setForm({
-							orderNumber: "",
-							customer: "",
-							contactEmail: "",
-							products: {
-								itemName: "",
-								quantity: "",
-								unitPrice: "",
-							},
-							status: "Pending",
-						});
-					}}
+					onClick={handleModalClose}
 					variant="outlined"
 					sx={{
 						borderColor: customColors.outline,
@@ -323,6 +345,7 @@ const CreateSOModal = ({ open, handleClose, salesOrders, onSuccess }) => {
 					type="submit"
 					variant="contained"
 					disableElevation
+					disabled={!selectedProductId}
 					sx={{
 						backgroundColor: customColors.primary,
 						color: customColors["on-primary"],

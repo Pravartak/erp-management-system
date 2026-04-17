@@ -1,13 +1,13 @@
 import { Navigate } from "react-router-dom";
+import { clearAuthStorage, hasValidToken } from "../utils/auth";
 
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem("Token");
+	if (!hasValidToken()) {
+		clearAuthStorage();
+		return <Navigate to={"/login"} replace />
+	}
 
-    if (!token) {
-        return <Navigate to={"/login"} />
-    };
-
-    return children;
+	return children;
 };
 
 export default ProtectedRoute;

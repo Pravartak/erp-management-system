@@ -1,70 +1,168 @@
-# Getting Started with Create React App
+# ERP Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack ERP dashboard built with React, Material UI, Express, and MongoDB. The project covers day-to-day ERP workflows including authentication, product management, orders, GRN processing, invoicing, directory access, and role-based admin controls.
+
+## Overview
+
+This project is designed as an internship-ready ERP application with:
+
+- JWT-based authentication
+- Role-based access control for `admin` and `sales`
+- Product inventory management
+- Purchase order and sales order workflows
+- GRN handling for received goods
+- Invoice generation from sales orders
+- User management for admins
+- Dashboard summaries for core business metrics
+
+## Tech Stack
+
+- Frontend: React, React Router, Material UI, Axios
+- Backend: Node.js, Express, Mongoose
+- Database: MongoDB
+- Authentication: JWT + protected API routes
+
+## Modules
+
+- `Dashboard`: High-level business summary cards and metrics
+- `Products`: Create, update, delete, and view inventory items
+- `Directory`: Business directory view inside the ERP shell
+- `Orders`: Purchase orders and sales orders management
+- `GRN`: Goods receipt note creation from purchase orders
+- `Invoices`: Invoice preview and save flow based on sales orders
+- `Users`: Admin-only user management
+- `Auth`: Login, registration, protected routes, and role checks
+
+## Roles
+
+- `admin`
+  Can access all modules, including user management and admin-only actions.
+- `sales`
+  Can access operational modules but not the admin users page.
+
+Public self-registration is restricted to the `sales` role. Admins can still create users with different roles from the admin panel.
+
+## Project Structure
+
+```text
+src/
+  backend/
+    controllers/
+    middleware/
+    models/
+    routes/
+    server.js
+  components/
+  pages/
+  utils/
+  App.js
+```
+
+## Local Setup
+
+### 1. Install frontend dependencies
+
+```bash
+npm install
+```
+
+### 2. Install backend dependencies
+
+```bash
+cd src/backend
+npm install
+```
+
+### 3. Configure environment variables
+
+Create `src/backend/.env` with:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+If you are running the frontend locally against the local backend, you can also place this in the root frontend environment if needed:
+
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+## Run Locally
+
+### Start the backend
+
+From `src/backend`:
+
+```bash
+node server.js
+```
+
+### Start the frontend
+
+From the project root:
+
+```bash
+npm start
+```
+
+Frontend runs on:
+
+```text
+http://localhost:3000
+```
+
+Backend runs on:
+
+```text
+http://localhost:5000
+```
 
 ## Available Scripts
 
-In the project directory, you can run:
+From the project root:
 
-### `npm start`
+```bash
+npm start
+npm test
+npm run build
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Authentication Notes
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Protected pages require a valid JWT token in local storage.
+- Invalid or expired tokens are cleared automatically and redirected to `/login`.
+- Admin-only access is enforced on both the frontend and backend.
 
-### `npm test`
+## Invoice Page Notes
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- The invoice page loads sales orders, generates an invoice preview, and saves invoices through the backend.
+- Saving an invoice also updates product stock based on sold quantities.
+- Invoice history currently falls back to `invoiceDate` because the invoice schema does not yet store automatic timestamps.
 
-### `npm run build`
+## Known Limitations
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Backend code is stored inside `src/backend`, which works for this project but is not the most typical production layout.
+- Automated test coverage is currently minimal.
+- Some validation and error handling are intentionally lightweight for internship scope.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Build Status
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The frontend production build passes successfully with:
 
-### `npm run eject`
+```bash
+npm run build
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Future Improvements
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Add stronger form validation across all modules
+- Improve automated test coverage
+- Add toast notifications instead of browser alerts
+- Add export/print support for invoices
+- Add better audit logging and activity history
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Author
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Built as an internship ERP project using React, Express, and MongoDB.

@@ -119,6 +119,12 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 		setForm((currentForm) => ({
 			...currentForm,
 			[name]: value,
+			...(name === "itemName" && {
+				products: {
+					...currentForm.products,
+					itemName: value,
+				},
+			}),
 			...(name === "quantity" && {
 				products: {
 					...currentForm.products,
@@ -135,8 +141,26 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 	};
 
 	const handleProductChange = (event) => {
+		const value = event.target.value;
+
+		if (value === "new") {
+			setForm((currentForm) => ({
+				...currentForm,
+				productId: "new",
+				supplier: "",
+				contactEmail: "",
+				SKU: "",
+				products: {
+					...currentForm.products,
+					itemName: "",
+					unitPrice: "",
+				},
+			}));
+			return;
+		}
+
 		const selectedProduct = products.find(
-			(product) => product._id === event.target.value,
+			(product) => product._id === value,
 		);
 
 		setForm((currentForm) => ({
@@ -160,8 +184,14 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+
+		const payload = { ...form };
+		if (payload.productId === "new") {
+			delete payload.productId;
+		}
+
 		try {
-			await api.post("/purchaseOrders", form);
+			await api.post("/purchaseOrders", payload);
 			await onSuccess?.();
 			resetForm();
 			handleClose();
@@ -256,6 +286,7 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 						value={form.productId}
 						required
 						onChange={handleProductChange}>
+						<MenuItem value="new">+ Add New Product</MenuItem>
 						{products.length > 0 ? (
 							products.map((product) => (
 								<MenuItem key={product._id} value={product._id}>
@@ -271,21 +302,27 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 				</FormControl>
 				<TextField
 					margin="dense"
+					id="SKU"
+					name="SKU"
 					label="SKU"
 					fullWidth
 					variant="outlined"
 					sx={textFieldStyles}
 					value={form.SKU}
-					InputProps={{ readOnly: true }}
+					onChange={handleFormChange}
+					InputProps={{ readOnly: form.productId !== "new" }}
 				/>
 				<TextField
 					margin="dense"
+					id="itemName"
+					name="itemName"
 					label="Item Name"
 					fullWidth
 					variant="outlined"
 					sx={textFieldStyles}
 					value={form.products.itemName}
-					InputProps={{ readOnly: true }}
+					onChange={handleFormChange}
+					InputProps={{ readOnly: form.productId !== "new" }}
 				/>
 				<FormControl fullWidth margin="dense" sx={textFieldStyles}>
 					<InputLabel id="status-label">Status</InputLabel>
@@ -359,7 +396,7 @@ const CreatePOModal = ({ open, handleClose, purchaseOrders, onSuccess }) => {
 					type="submit"
 					variant="contained"
 					disableElevation
-					disabled={!form.productId}
+					disabled={!form.productId || (form.productId === "new" && !form.products.itemName)}
 					sx={{
 						backgroundColor: customColors.primary,
 						color: customColors["on-primary"],

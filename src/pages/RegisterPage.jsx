@@ -11,11 +11,17 @@ const RegisterPage = () => {
 		name: "",
 		email: "",
 		password: "",
-		role: "admin",
+		role: "sales",
 	});
+	const [confirmPassword, setConfirmPassword] = useState("");
 
 	const handleRegister = async (e) => {
 		e.preventDefault();
+
+		if (form.password !== confirmPassword) {
+			alert("Passwords do not match.");
+			return;
+		}
 
 		try {
 			await api.post("/auth/register", form);
@@ -90,9 +96,11 @@ const RegisterPage = () => {
 						type="password"
 						fullWidth
 						size="small"
+						value={confirmPassword}
+						onChange={(e) => setConfirmPassword(e.target.value)}
 					/>
 					<Button
-					onClick={handleRegister}
+						onClick={handleRegister}
 						variant="contained"
 						disableElevation
 						sx={{
