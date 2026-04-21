@@ -28,13 +28,14 @@ const GrnHeader = ({ onDiscard, onSubmit }) => (
 				Verify and record incoming stock against purchase orders.
 			</Typography>
 		</Box>
-		<Box sx={{ display: "flex", gap: 1.5 }}>
+		<Box sx={{ display: "flex", gap: 1.5, flexDirection: { xs: "column-reverse", sm: "row" }, width: { xs: "100%", sm: "auto" } }}>
 			<Button
 				variant="outlined"
 				onClick={onDiscard}
 				sx={{
 					px: 2,
 					py: 1,
+					width: { xs: "100%", sm: "auto" },
 					borderRadius: 2,
 					textTransform: "none",
 					fontWeight: 600,
@@ -52,6 +53,7 @@ const GrnHeader = ({ onDiscard, onSubmit }) => (
 				sx={{
 					px: 2.5,
 					py: 1,
+					width: { xs: "100%", sm: "auto" },
 					borderRadius: 2,
 					textTransform: "none",
 					fontWeight: 700,

@@ -20,8 +20,8 @@ const ProductHeader = ({ onAddNewProduct, products, filteredCount, isLoading, cu
 						: `Tracking ${products.length} products with ${filteredCount} currently matching your filters. Inventory value: ${new Intl.NumberFormat("en-IN", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(totalInventoryValue)}.`}
 				</Typography>
 			</Box>
-			<Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-				<Button variant="contained" disableElevation onClick={onAddNewProduct} startIcon={<MaterialIcon name="add" />} sx={{ backgroundColor: customColors["primary-container"], color: customColors["on-primary-container"], textTransform: "none", fontWeight: 600, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: "rgba(212, 227, 255, 0.8)" } }}>
+			<Box sx={{ display: "flex", alignItems: { xs: "stretch", sm: "center" }, gap: 1.5, flexWrap: "wrap", flexDirection: { xs: "column", sm: "row" }, width: { xs: "100%", md: "auto" } }}>
+				<Button variant="contained" disableElevation onClick={onAddNewProduct} startIcon={<MaterialIcon name="add" />} sx={{ backgroundColor: customColors["primary-container"], color: customColors["on-primary-container"], textTransform: "none", fontWeight: 600, borderRadius: 2, px: 2, py: 1, width: { xs: "100%", sm: "auto" }, "&:hover": { backgroundColor: "rgba(212, 227, 255, 0.8)" } }}>
 					Add New Product
 				</Button>
 				<Button
@@ -40,7 +40,7 @@ const ProductHeader = ({ onAddNewProduct, products, filteredCount, isLoading, cu
 						link.click();
 						URL.revokeObjectURL(link.href);
 					}}
-					sx={{ borderColor: customColors.outline, color: customColors["on-surface"], textTransform: "none", fontWeight: 500, borderRadius: 2, px: 2, py: 1, "&:hover": { backgroundColor: customColors["surface-container"], borderColor: customColors.outline } }}>
+					sx={{ borderColor: customColors.outline, color: customColors["on-surface"], textTransform: "none", fontWeight: 500, borderRadius: 2, px: 2, py: 1, width: { xs: "100%", sm: "auto" }, "&:hover": { backgroundColor: customColors["surface-container"], borderColor: customColors.outline } }}>
 					Export
 				</Button>
 			</Box>

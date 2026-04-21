@@ -40,6 +40,7 @@ const UsersHeader = ({ onAddNewUser }) => (
 				borderRadius: 2.5,
 				px: 2.5,
 				py: 1.25,
+				width: { xs: "100%", sm: "auto" },
 				boxShadow: "0px 10px 20px rgba(0, 95, 175, 0.2)",
 				"&:hover": { backgroundColor: customColors["primary-dim"] },
 				"&:active": { transform: "scale(0.98)" },

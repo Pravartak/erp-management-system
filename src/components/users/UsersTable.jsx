@@ -57,7 +57,7 @@ const UsersTable = ({
 			}}>
 			<Box
 				sx={{
-					px: 3,
+					px: { xs: 2, sm: 3 },
 					py: 2,
 					borderBottom: "1px solid #f1f5f9",
 					display: "flex",
@@ -77,7 +77,7 @@ const UsersTable = ({
 						</Typography>
 					</Box>
 				</Box>
-				<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+				<Box sx={{ display: "flex", alignItems: { xs: "stretch", sm: "center" }, gap: 1, flexDirection: { xs: "column", sm: "row" }, width: { xs: "100%", md: "auto" } }}>
 					<Button
 						variant="contained"
 						disabled
@@ -89,6 +89,7 @@ const UsersTable = ({
 							fontSize: 12,
 							fontWeight: 700,
 							boxShadow: "none",
+							width: { xs: "100%", sm: "auto" },
 						}}>
 						Filter
 					</Button>
@@ -115,13 +116,58 @@ const UsersTable = ({
 							fontSize: 12,
 							fontWeight: 700,
 							boxShadow: "none",
+							width: { xs: "100%", sm: "auto" },
 							"&:hover": { backgroundColor: "#f1f5f9" },
 						}}>
 						Export
 					</Button>
 				</Box>
 			</Box>
-			<Box sx={{ overflowX: "auto" }}>
+			<Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", gap: 1.5, p: 2 }}>
+				{users.length === 0 ? (
+					<Box sx={{ px: 2, py: 4, textAlign: "center", color: "#64748b", border: "1px dashed #cbd5e1", borderRadius: 2 }}>
+						{isLoading ? "Loading users..." : "No users found yet."}
+					</Box>
+				) : (
+					users.map((user) => {
+						const roleStyles = getRoleStyles(user.role);
+						return (
+							<Box key={user._id} sx={{ border: "1px solid #e2e8f0", borderRadius: 2, p: 2, display: "flex", flexDirection: "column", gap: 1.25 }}>
+								<Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
+									<Box>
+										<Typography sx={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+											{user.name || "Unnamed user"}
+										</Typography>
+										<Typography sx={{ fontSize: 12, color: "#64748b", wordBreak: "break-word" }}>
+											{user.email}
+										</Typography>
+									</Box>
+									<Box sx={{ display: "inline-flex", px: 1.5, py: 0.5, borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", backgroundColor: roleStyles.backgroundColor, color: roleStyles.color, alignSelf: "flex-start" }}>
+										{user.role}
+									</Box>
+								</Box>
+								<Box>
+									<Typography sx={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>
+										Created {formatDate(user.createdAt)}
+									</Typography>
+									<Typography sx={{ fontSize: 11, color: "#94a3b8" }}>
+										Last updated {formatDate(user.updatedAt)}
+									</Typography>
+								</Box>
+								<Box sx={{ display: "flex", gap: 1 }}>
+									<IconButton onClick={() => onUpdateUser(user._id)} sx={{ color: "#2563eb", backgroundColor: "#dbeafe" }}>
+										<MaterialIcon name="edit" sx={{ fontSize: 20 }} />
+									</IconButton>
+									<IconButton onClick={() => onDeleteUser(user._id)} sx={{ color: "#9f403d", backgroundColor: "rgba(254, 137, 131, 0.2)" }}>
+										<MaterialIcon name="delete" sx={{ fontSize: 20 }} />
+									</IconButton>
+								</Box>
+							</Box>
+						);
+					})
+				)}
+			</Box>
+			<Box sx={{ overflowX: "auto", display: { xs: "none", md: "block" } }}>
 				<Table sx={{ minWidth: 900 }}>
 					<TableHead>
 						<TableRow sx={{ backgroundColor: "rgba(248, 250, 252, 0.5)" }}>

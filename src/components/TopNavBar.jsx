@@ -39,17 +39,19 @@ const TopNavBar = ({
 			}}>
 			<Toolbar
 				sx={{
-					px: 3,
+					px: { xs: 2, sm: 3 },
 					minHeight: 64,
 					display: "flex",
 					justifyContent: "space-between",
+					gap: 1.5,
 				}}>
-				<Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+				<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, md: 3 }, minWidth: 0 }}>
 					<Typography
 						sx={{
-							fontSize: 20,
+							fontSize: { xs: 16, sm: 20 },
 							fontWeight: 700,
 							color: "#1d4ed8",
+							whiteSpace: "nowrap",
 						}}>
 						ERP Core
 					</Typography>
@@ -86,7 +88,7 @@ const TopNavBar = ({
 						/>
 					</Box>
 				</Box>
-				<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+				<Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1.5 }, flexShrink: 0 }}>
 					<IconButton
 						sx={{
 							color: "#64748b",
@@ -95,6 +97,7 @@ const TopNavBar = ({
 								backgroundColor: customColors["surface-container-low"],
 							},
 							position: "relative",
+							p: { xs: 0.75, sm: 1 },
 						}}>
 						<MaterialIcon name="notifications" />
 						{showNotificationDot ? (
@@ -119,6 +122,7 @@ const TopNavBar = ({
 							"&:hover": {
 								backgroundColor: customColors["surface-container-low"],
 							},
+							p: { xs: 0.75, sm: 1 },
 						}}>
 						<MaterialIcon name="settings" />
 					</IconButton>
@@ -126,8 +130,8 @@ const TopNavBar = ({
 						alt="User Profile"
 						src={avatarSrc}
 						sx={{
-							width: 32,
-							height: 32,
+							width: { xs: 28, sm: 32 },
+							height: { xs: 28, sm: 32 },
 							border: `1px solid ${resolvedAvatarBorder}`,
 						}}
 					/>

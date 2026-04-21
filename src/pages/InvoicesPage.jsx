@@ -155,8 +155,8 @@ const InvoicesPage = () => {
 		<Box sx={{ backgroundColor: customColors.background, color: customColors["on-background"], minHeight: "100vh" }}>
 			<TopNavBar searchVariant="dashboard" />
 			<SideNavBar activeLabel="Invoices" />
-			<Box component="main" sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh" }}>
-				<Box sx={{ p: { xs: 3, lg: 5 }, maxWidth: 1280, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
+			<Box component="main" sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh", pb: { xs: 10, md: 0 } }}>
+				<Box sx={{ p: { xs: 2, sm: 3, lg: 5 }, maxWidth: 1280, mx: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
 					<InvoicesHeader
 						salesOrders={allSOs}
 						selectedSalesOrder={selectedSalesOrder}

@@ -30,6 +30,7 @@ const DirectoryHeader = ({ users, products }) => (
 				color: "#fff",
 				px: 2.5,
 				py: 1.25,
+				width: { xs: "100%", sm: "auto" },
 				borderRadius: 2,
 				textTransform: "none",
 				fontWeight: 600,

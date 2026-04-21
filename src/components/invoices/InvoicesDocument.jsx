@@ -27,17 +27,19 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 				backgroundColor: "#fff",
 				borderRadius: 2,
 				boxShadow: "0px 20px 40px rgba(148, 163, 184, 0.3)",
-				p: 6,
-				minHeight: 1056,
+				p: { xs: 2, sm: 3, lg: 6 },
+				minHeight: { xs: "auto", lg: 1056 },
 				display: "flex",
 				flexDirection: "column",
 			}}>
 			<Box
 				sx={{
 					display: "flex",
+					flexDirection: { xs: "column", sm: "row" },
 					justifyContent: "space-between",
-					alignItems: "flex-start",
-					mb: 6,
+					alignItems: { xs: "stretch", sm: "flex-start" },
+					gap: 3,
+					mb: { xs: 4, sm: 6 },
 				}}>
 				<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 					<Box
@@ -71,15 +73,15 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 				</Box>
 				<Box
 					sx={{
-						textAlign: "right",
+						textAlign: { xs: "left", sm: "right" },
 						display: "flex",
 						flexDirection: "column",
 						gap: 1.5,
-						minWidth: 220,
+						minWidth: { xs: "100%", sm: 220 },
 					}}>
 					<Typography
 						sx={{
-							fontSize: 32,
+							fontSize: { xs: 24, sm: 32 },
 							fontWeight: 900,
 							color: "rgba(15, 23, 42, 0.1)",
 							letterSpacing: "0.2em",
@@ -107,9 +109,9 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 			<Box
 				sx={{
 					display: "grid",
-					gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-					gap: 6,
-					mb: 6,
+					gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+					gap: { xs: 3, sm: 6 },
+					mb: { xs: 4, sm: 6 },
 				}}>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 					<Typography
@@ -195,8 +197,8 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 				</Box>
 			</Box>
 
-			<Box sx={{ flex: 1 }}>
-				<Table>
+			<Box sx={{ flex: 1, overflowX: "auto" }}>
+				<Table sx={{ minWidth: { xs: 560, md: "auto" } }}>
 					<TableHead>
 						<TableRow>
 							{["Description", "Qty", "Unit Price", "Total"].map(
@@ -262,7 +264,7 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 				</Table>
 			</Box>
 
-			<Box sx={{ mt: 6, display: "flex", justifyContent: "flex-end" }}>
+			<Box sx={{ mt: { xs: 4, sm: 6 }, display: "flex", justifyContent: "flex-end" }}>
 				<Box
 					sx={{
 						width: "100%",
@@ -322,11 +324,11 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 
 			<Box
 				sx={{
-					mt: 8,
+					mt: { xs: 5, sm: 8 },
 					pt: 4,
 					borderTop: "1px solid #f1f5f9",
 					display: "grid",
-					gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+					gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
 					gap: 4,
 					alignItems: "end",
 				}}>
@@ -352,7 +354,7 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 						Please include the invoice number on your payment reference.
 					</Typography>
 				</Box>
-				<Box sx={{ textAlign: "right" }}>
+				<Box sx={{ textAlign: { xs: "left", md: "right" } }}>
 					<Typography sx={{ fontSize: 10, color: "#94a3b8", fontWeight: 600 }}>
 						Authorized Signature
 					</Typography>
@@ -361,7 +363,7 @@ const InvoicesDocument = ({ invoiceForm, onInvoiceFormChange }) => {
 							mt: 2,
 							borderBottom: "1px solid #cbd5e1",
 							width: 128,
-							ml: "auto",
+							ml: { xs: 0, md: "auto" },
 						}}
 					/>
 					<Typography

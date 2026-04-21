@@ -233,14 +233,14 @@ const OrdersTable = ({
 
 	return (
 		<Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e2e8f0", backgroundColor: "#fff", boxShadow: "0px 8px 16px rgba(15, 23, 42, 0.05)", overflow: "hidden" }}>
-			<Box sx={{ display: "flex", alignItems: "center", borderBottom: "1px solid #e2e8f0", backgroundColor: "rgba(248, 250, 252, 0.5)", px: 3 }}>
+			<Box sx={{ display: "flex", alignItems: "center", borderBottom: "1px solid #e2e8f0", backgroundColor: "rgba(248, 250, 252, 0.5)", px: { xs: 2, sm: 3 }, flexWrap: "wrap", gap: 1 }}>
 				<Button onClick={() => handleTabChange("sales")} sx={tabButtonStyles(isSalesOrders)}>
 					Sales Orders
 				</Button>
 				<Button onClick={() => handleTabChange("purchase")} sx={tabButtonStyles(!isSalesOrders)}>
 					Purchase Orders
 				</Button>
-				<Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
+				<Box sx={{ ml: { xs: 0, sm: "auto" }, display: "flex", gap: 1 }}>
 					<IconButton sx={{ color: "#94a3b8", "&:hover": { color: "#475569" } }}>
 						<MaterialIcon name="filter_list" sx={{ fontSize: 20 }} />
 					</IconButton>
@@ -249,7 +249,51 @@ const OrdersTable = ({
 					</IconButton>
 				</Box>
 			</Box>
-			<Box sx={{ overflowX: "auto" }}>
+			<Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", gap: 1.5, p: 2 }}>
+				{paginatedRows.length > 0 ? (
+					paginatedRows.map((row) => (
+						<Box key={row.originalId} sx={{ border: "1px solid #e2e8f0", borderRadius: 2, p: 2, display: "flex", flexDirection: "column", gap: 1.25 }}>
+							<Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
+								<Box>
+									<Box sx={{ fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#005faf" }}>
+										{row.orderNumber}
+									</Box>
+									<Box sx={{ fontSize: 13, color: "#64748b", mt: 0.5 }}>{row.date}</Box>
+								</Box>
+								<IconButton onClick={(event) => handleMenuClick(event, row)} sx={{ alignSelf: "flex-start", color: "#94a3b8" }}>
+									<MaterialIcon name="more_vert" sx={{ fontSize: 18 }} />
+								</IconButton>
+							</Box>
+							<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+								<Box sx={{ width: 32, height: 32, borderRadius: 1, backgroundColor: row.initialsBg, color: row.initialsColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>
+									{row.initials}
+								</Box>
+								<Box sx={{ fontSize: 14, fontWeight: 500 }}>
+									{isSalesOrders ? row.customer : row.supplier}
+								</Box>
+							</Box>
+							<Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 1 }}>
+								<Box>
+									<Box sx={{ fontSize: 11, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Item</Box>
+									<Box sx={{ fontSize: 13, color: "#64748b" }}>{row?.itemName || "N/A"}</Box>
+								</Box>
+								<Box>
+									<Box sx={{ fontSize: 11, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Amount</Box>
+									<Box sx={{ fontSize: 14, fontWeight: 600 }}>{row.amount}</Box>
+								</Box>
+							</Box>
+							<Box sx={{ display: "inline-flex", alignItems: "center", alignSelf: "flex-start", px: 1.5, py: 0.5, borderRadius: 999, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", backgroundColor: row.statusBg, color: row.statusColor }}>
+								{row.status}
+							</Box>
+						</Box>
+					))
+				) : (
+					<Box sx={{ px: 2, py: 4, textAlign: "center", color: "#64748b", border: "1px dashed #cbd5e1", borderRadius: 2 }}>
+						No {isSalesOrders ? "sales" : "purchase"} orders found.
+					</Box>
+				)}
+			</Box>
+			<Box sx={{ overflowX: "auto", display: { xs: "none", md: "block" } }}>
 				<Table sx={{ minWidth: 900 }}>
 					<TableHead>
 						<TableRow sx={{ backgroundColor: "rgba(248, 250, 252, 0.3)" }}>

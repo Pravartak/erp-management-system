@@ -142,10 +142,10 @@ const ProductManagementPage = () => {
 			<SideNavBar activeLabel="Product Management" />
 			<Box
 				component="main"
-				sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh" }}>
+				sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh", pb: { xs: 10, md: 0 } }}>
 				<Box
 					sx={{
-						p: { xs: 3, lg: 5 },
+						p: { xs: 2, sm: 3, lg: 5 },
 						maxWidth: 1280,
 						mx: "auto",
 						display: "flex",

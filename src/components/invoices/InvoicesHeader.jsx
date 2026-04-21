@@ -66,7 +66,7 @@ const InvoicesHeader = ({
 				</Select>
 			</FormControl>
 		</Box>
-		<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+		<Box sx={{ display: "flex", alignItems: "center", gap: 1.5, width: { xs: "100%", md: "auto" } }}>
 			<Button
 				variant="contained"
 				disableElevation
@@ -80,6 +80,7 @@ const InvoicesHeader = ({
 					borderRadius: 2,
 					px: 3,
 					py: 1,
+					width: { xs: "100%", md: "auto" },
 					boxShadow: "0px 10px 20px rgba(0, 95, 175, 0.2)",
 					"&:hover": { backgroundColor: customColors["primary-dim"] },
 				}}>

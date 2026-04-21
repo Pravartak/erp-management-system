@@ -90,10 +90,10 @@ const UsersPage = () => {
 			<SideNavBar activeLabel="User Management" />
 			<Box
 				component="main"
-				sx={{ pl: { xs: 0, md: 32 }, pt: 8, minHeight: "100vh" }}>
+				sx={{ pl: { xs: 0, md: 32 }, pt: 8, minHeight: "100vh", pb: { xs: 10, md: 0 } }}>
 				<Box
 					sx={{
-						p: { xs: 3, lg: 5 },
+						p: { xs: 2, sm: 3, lg: 5 },
 						maxWidth: 1280,
 						mx: "auto",
 						display: "flex",

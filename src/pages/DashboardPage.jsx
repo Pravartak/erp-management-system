@@ -81,10 +81,10 @@ const DashboardPage = () => {
 			<SideNavBar activeLabel="Dashboard" />
 			<Box
 				component="main"
-				sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh" }}>
+				sx={{ pt: 8, pl: { xs: 0, md: 32 }, minHeight: "100vh", pb: { xs: 10, md: 0 } }}>
 				<Box
 					sx={{
-						p: { xs: 3, lg: 5 },
+						p: { xs: 2, sm: 3, lg: 5 },
 						maxWidth: 1280,
 						mx: "auto",
 						display: "flex",
@@ -117,7 +117,7 @@ const DashboardPage = () => {
 								Real-time enterprise metrics and performance insights.
 							</Typography>
 						</Box>
-						<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+						<Box sx={{ display: "flex", alignItems: "stretch", gap: 1, flexDirection: { xs: "column", sm: "row" }, width: { xs: "100%", sm: "auto" } }}>
 							<Button
 								variant="contained"
 								disableElevation
@@ -130,6 +130,7 @@ const DashboardPage = () => {
 									textTransform: "none",
 									fontWeight: 600,
 									borderRadius: 2,
+									width: { xs: "100%", sm: "auto" },
 									"&:hover": {
 										backgroundColor: customColors["surface-container-highest"],
 									},
@@ -148,6 +149,7 @@ const DashboardPage = () => {
 									textTransform: "none",
 									fontWeight: 600,
 									borderRadius: 2,
+									width: { xs: "100%", sm: "auto" },
 									boxShadow: "0px 8px 20px rgba(0, 95, 175, 0.25)",
 									"&:hover": {
 										backgroundColor: customColors["primary-dim"],
@@ -216,11 +218,11 @@ const DashboardPage = () => {
 							<Paper
 								elevation={0}
 								sx={{
-									p: 3,
+									p: { xs: 2, sm: 3 },
 									borderRadius: 3,
 									border: `1px solid ${customColors["surface-container"]}`,
 									backgroundColor: customColors["surface-container-lowest"],
-									height: 400,
+									height: { xs: 320, sm: 400 },
 								}}>
 								<Typography
 									sx={{
@@ -231,7 +233,7 @@ const DashboardPage = () => {
 									}}>
 									Revenue Over Time
 								</Typography>
-								<Box sx={{ height: 300 }}>
+								<Box sx={{ height: { xs: 220, sm: 300 } }}>
 									<Line data={revenueData} options={chartOptions} />
 								</Box>
 							</Paper>
@@ -240,11 +242,11 @@ const DashboardPage = () => {
 							<Paper
 								elevation={0}
 								sx={{
-									p: 3,
+									p: { xs: 2, sm: 3 },
 									borderRadius: 3,
 									border: `1px solid ${customColors["surface-container"]}`,
 									backgroundColor: customColors["surface-container-lowest"],
-									height: 400,
+									height: { xs: 320, sm: 400 },
 								}}>
 								<Typography
 									sx={{
@@ -255,7 +257,7 @@ const DashboardPage = () => {
 									}}>
 									Orders Overview
 								</Typography>
-								<Box sx={{ height: 300 }}>
+								<Box sx={{ height: { xs: 220, sm: 300 } }}>
 									<Bar
 										data={{
 											labels: ["Orders"],

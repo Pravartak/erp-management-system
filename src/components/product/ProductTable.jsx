@@ -116,7 +116,79 @@ const ProductTable = ({
 				overflow: "hidden",
 				backgroundColor: customColors["surface-container-lowest"],
 			}}>
-			<Box sx={{ overflowX: "auto" }}>
+			<Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", gap: 1.5, p: 2 }}>
+				{formattedProducts.length === 0 ? (
+					<Box
+						sx={{
+							px: 2,
+							py: 4,
+							textAlign: "center",
+							color: customColors["on-surface-variant"],
+							border: `1px dashed ${customColors["outline-variant"]}`,
+							borderRadius: 2,
+						}}>
+						{isLoading
+							? "Loading products..."
+							: "No products match the current filters."}
+					</Box>
+				) : (
+					formattedProducts.map((row) => (
+						<Box
+							key={row.originalId}
+							sx={{
+								border: `1px solid ${customColors["surface-container"]}`,
+								borderRadius: 2,
+								p: 2,
+								display: "flex",
+								flexDirection: "column",
+								gap: 1.5,
+							}}>
+							<Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5 }}>
+								<Box>
+									<Typography sx={{ fontSize: 15, fontWeight: 700, color: customColors["on-surface"] }}>
+										{row.name}
+									</Typography>
+									<Typography sx={{ fontSize: 12, color: customColors["on-surface-variant"] }}>
+										{row.id} · {row.SKU}
+									</Typography>
+								</Box>
+								<IconButton
+									onClick={(event) => handleMenuClick(event, row.originalId)}
+									sx={{ alignSelf: "flex-start", color: customColors.outline }}>
+									<MaterialIcon name="more_vert" />
+								</IconButton>
+							</Box>
+							<Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 1.25 }}>
+								<Box>
+									<Typography sx={{ fontSize: 11, color: customColors["on-surface-variant"], textTransform: "uppercase", letterSpacing: "0.08em" }}>
+										Category
+									</Typography>
+									<Typography sx={{ fontSize: 14, fontWeight: 600 }}>{row.category}</Typography>
+								</Box>
+								<Box>
+									<Typography sx={{ fontSize: 11, color: customColors["on-surface-variant"], textTransform: "uppercase", letterSpacing: "0.08em" }}>
+										Price
+									</Typography>
+									<Typography sx={{ fontSize: 14, fontWeight: 700 }}>{row.price}</Typography>
+								</Box>
+							</Box>
+							<Box>
+								<Box sx={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: customColors["on-surface-variant"], mb: 0.5 }}>
+									<span>{row.stockText}</span>
+									<span>{row.stockPercent}%</span>
+								</Box>
+								<Box sx={{ height: 6, borderRadius: 999, backgroundColor: customColors["surface-container"], overflow: "hidden" }}>
+									<Box sx={{ width: `${row.stockPercent}%`, height: "100%", backgroundColor: row.stockColor }} />
+								</Box>
+							</Box>
+							<Box sx={{ display: "inline-flex", alignItems: "center", alignSelf: "flex-start", px: 1.5, py: 0.5, borderRadius: 999, fontSize: 12, fontWeight: 600, backgroundColor: row.statusBg, color: row.statusColor }}>
+								{row.status}
+							</Box>
+						</Box>
+					))
+				)}
+			</Box>
+			<Box sx={{ overflowX: "auto", display: { xs: "none", md: "block" } }}>
 				<Table sx={{ minWidth: 900 }}>
 					<TableHead>
 						<TableRow
@@ -335,7 +407,7 @@ const ProductTable = ({
 			</Menu>
 			<Box
 				sx={{
-					px: 3,
+					px: { xs: 2, sm: 3 },
 					py: 2,
 					backgroundColor: customColors["surface-container-low"],
 					borderTop: `1px solid rgba(178, 177, 180, 0.5)`,

@@ -40,7 +40,7 @@ const UsersRoleCard = ({ users, isLoading }) => {
 					? "Loading current access mix..."
 					: `${adminCount} admin accounts and ${salesCount} sales accounts are currently configured. ${dominantRole} is the largest role group.`}
 			</Typography>
-			<Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5, mb: 3 }}>
+			<Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1.5, mb: 3 }}>
 				<Paper elevation={0} sx={{ p: 1.5, borderRadius: 2, backgroundColor: "#fff" }}>
 					<Typography sx={{ fontSize: 10, textTransform: "uppercase", color: "#94a3b8", fontWeight: 700 }}>
 						Admins

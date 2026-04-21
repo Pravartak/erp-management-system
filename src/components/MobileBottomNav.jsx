@@ -23,8 +23,10 @@ const MobileBottomNav = ({ activeLabel = 'Home' }) => (
       backgroundColor: customColors['surface-container-lowest'],
       borderTop: `1px solid ${customColors['surface-container']}`,
       justifyContent: 'space-around',
-      py: 1.5,
+      py: 1,
+      px: 0.5,
       zIndex: 1300,
+      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
     }}
   >
     {items.map((item) => {
@@ -36,6 +38,7 @@ const MobileBottomNav = ({ activeLabel = 'Home' }) => (
           to={item.to}
           sx={{
             minWidth: 'auto',
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
             gap: 0.5,
@@ -43,6 +46,9 @@ const MobileBottomNav = ({ activeLabel = 'Home' }) => (
             textTransform: 'none',
             fontSize: 10,
             fontWeight: isActive ? 700 : 500,
+            px: 0.5,
+            py: 0.75,
+            borderRadius: 2,
           }}
         >
           <MaterialIcon name={item.icon} />
